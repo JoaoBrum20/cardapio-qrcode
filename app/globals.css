@@ -612,3 +612,16 @@
     flex-basis:320px;
   }
 }
+
+.order-success{
+  position:fixed;
+  z-index:80;
+  right:18px;
+  top:72px;
+  background:#1f6f3d;
+  color:#fff;
+  border-radius:10px;
+  padding:12px 16px;
+  font-weight:800;
+  box-shadow:0 10px 30px rgba(0,0,0,.16);
+}
