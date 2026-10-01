@@ -174,14 +174,10 @@ export default function PedidosPage() {
       <TestNav />
 
       <header className="orders-header">
-        <div>
-          <span className="orders-kicker">PAINEL DA PADARIA</span>
-          <h1>Pedidos</h1>
-        </div>
-
+        <h1>Pedidos</h1>
         <div className="orders-summary">
           <strong>{activeOrders.length}</strong>
-          <span>pedidos ativos</span>
+          <span>ativos</span>
         </div>
       </header>
 
@@ -204,7 +200,7 @@ export default function PedidosPage() {
 
               {order.note && (
                 <div className="order-note">
-                  <span>Observação</span>
+                  <span>ATENÇÃO</span>
                   <strong>{order.note}</strong>
                 </div>
               )}
@@ -215,7 +211,7 @@ export default function PedidosPage() {
                   disabled={order.status === 'PRONTO'}
                   onClick={() => markReady(order.id)}
                 >
-                  {order.status === 'PRONTO' ? 'Pronto' : 'Marcar como pronto'}
+                  {order.status === 'PRONTO' ? 'PEDIDO PRONTO' : 'MARCAR COMO PRONTO'}
                 </button>
               </div>
             </div>
