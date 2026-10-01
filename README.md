@@ -1,6 +1,6 @@
-# Padaria QR
+# Cardápio QR Code
 
-Sistema de cardápio digital e pedidos por QR Code para padarias.
+Sistema de cardápio digital e pedidos por QR Code para estabelecimentos.
 
 ## Arquitetura
 
@@ -8,20 +8,28 @@ Sistema de cardápio digital e pedidos por QR Code para padarias.
 - **Hospedagem:** Vercel
 - **Código e documentação:** GitHub
 - **Gestão do projeto:** Notion
-- **Próxima camada:** Supabase/PostgreSQL para produtos, mesas, pedidos e itens de pedido
+- **Banco:** Supabase/PostgreSQL
 
-## Fluxo planejado
+## Fluxo
 
-QR Code da mesa → Cardápio → Carrinho → Pedido → Banco → Tela da padaria → Status do pedido
+QR Code da mesa → Cardápio → Carrinho → Pedido → Supabase → Tela operacional → Status do pedido → Cliente
+
+## Banco atual
+
+- `CARDAPIO_QRCODE_PEDIDOS`
+- `CARDAPIO_QRCODE_CONTATOS`
 
 ## Estado atual
 
 - Cardápio mobile-first
 - Busca por produto
 - Filtro por categoria
-- Carrinho local
-- Mesa lida por `?mesa=12`
-- Envio real do pedido ainda não conectado ao backend
+- Carrinho
+- QR/mesa por query string
+- Pedido gravado no Supabase
+- Tela operacional de pedidos
+- Status: recebido → preparando → pronto
+- Acompanhamento do cliente
 
 ## Rodar localmente
 
