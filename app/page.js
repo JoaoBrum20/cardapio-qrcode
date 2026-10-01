@@ -59,7 +59,58 @@ const products = [
   ['Sobremesas','Pudim',11.90,'Pudim cremoso de leite condensado.'],
   ['Sobremesas','Milk-shake Chocolate',18.90,'Milk-shake cremoso de chocolate, 400 ml.'],
   ['Sobremesas','Milk-shake Morango',18.90,'Milk-shake cremoso de morango, 400 ml.']
-].map((p, i) => ({ id: i + 1, category: p[0], name: p[1], price: p[2], description: p[3], image: '/images/smash-bacon.jpg' }));
+];
+
+const productImages = {
+  'Smash Bacon': '/images/smash_bacon.png',
+  'Duplo Cheddar': '/images/duplo_bacon.png',
+  'Burger da Casa': '/images/burger_casa.png',
+  'Combo Smash': '/images/combo_smash.png',
+  'Batata Cheddar e Bacon': '/images/batata_chedar.png',
+  'Smash Simples': '/images/smash_bacon.png',
+  'Smash Salada': '/images/smash_saalda.png',
+  'Smash Duplo': '/images/duplo_bacon.png',
+  'Smash Triplo': '/images/duplo_bacon.png',
+  'Burger Clássico': '/images/smash_saalda.png',
+  'Burger Bacon': '/images/smash_bacon.png',
+  'Burger Gorgonzola': '/images/burger_casa.png',
+  'Burger Costela': '/images/burger_casa.png',
+  'Burger Picante': '/images/smash_bacon.png',
+  'Burger Frango Crocante': '/images/burger_casa.png',
+  'Burger Vegetariano': '/images/smash_saalda.png',
+  'Combo Bacon': '/images/combo_smash.png',
+  'Combo Artesanal': '/images/combo_smash.png',
+  'Combo Duplo': '/images/combo_smash.png',
+  'Combo Família': '/images/combo_smash.png',
+  'Batata Frita Individual': '/images/batata_chedar.png',
+  'Batata Frita Grande': '/images/batata_chedar.png',
+  'Batata com Costela': '/images/batata_chedar.png',
+  'Onion Rings': '/images/onion_ring.png',
+  'Nuggets': '/images/onion_ring.png',
+  'Molho da Casa': '/images/batata_chedar.png',
+  'Barbecue': '/images/batata_chedar.png',
+  'Cheddar Cremoso': '/images/batata_chedar.png',
+  'Bacon Extra': '/images/batata_chedar.png',
+  'Coca-Cola lata': '/images/refri.png',
+  'Coca-Cola Zero lata': '/images/refri.png',
+  'Guaraná lata': '/images/refri.png',
+  'Refrigerante 1L': '/images/refri.png',
+  'Água mineral': '/images/refri.png',
+  'Água com gás': '/images/refri.png',
+  'Brownie': '/images/Brownie.png',
+  'Pudim': '/images/Brownie.png',
+  'Milk-shake Chocolate': '/images/milkshake.png',
+  'Milk-shake Morango': '/images/milkshake.png',
+};
+
+const productsWithImages = products.map((p, i) => ({
+  id: i + 1,
+  category: p[0],
+  name: p[1],
+  price: p[2],
+  description: p[3],
+  image: productImages[p[1]] || '/images/smash-bacon.jpg',
+}));
 
 const money = (n) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(n);
 
