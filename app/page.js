@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import TestNav from '../components/TestNav';
 
 const categories = [
@@ -137,8 +137,40 @@ export default function Home() {
   const [cartOpen, setCartOpen] = useState(false);
   const [orderNote, setOrderNote] = useState('');
   const [sentMessage, setSentMessage] = useState('');
+  const [activeOrder, setActiveOrder] = useState(null);
+  const [whatsapp, setWhatsapp] = useState('');
+  const [marketingSaved, setMarketingSaved] = useState(false);
 
-  const mesa = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('mesa') || '12' : '12';
+  const params = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+  const qrFromUrl = params?.get('qr') || params?.get('mesa') || '';
+  const mesa = activeOrder?.table ?? (qrFromUrl || '—');
+
+  useEffect(() => {
+    const syncActiveOrder = () => {
+      const orderId = sessionStorage.getItem('padaria_active_order_id');
+      if (!orderId) return;
+
+      try {
+        const orders = JSON.parse(localStorage.getItem('padaria_qr_orders_v1') || '[]');
+        const current = Array.isArray(orders)
+          ? orders.find((order) => String(order.id) === String(orderId))
+          : null;
+
+        if (current) setActiveOrder(current);
+      } catch {}
+    };
+
+    syncActiveOrder();
+    window.addEventListener('storage', syncActiveOrder);
+    window.addEventListener('padaria-orders-updated', syncActiveOrder);
+    const interval = window.setInterval(syncActiveOrder, 1200);
+
+    return () => {
+      window.removeEventListener('storage', syncActiveOrder);
+      window.removeEventListener('padaria-orders-updated', syncActiveOrder);
+      window.clearInterval(interval);
+    };
+  }, []);
 
   const visible = useMemo(() => {
     const term = query.trim().toLowerCase();
@@ -159,7 +191,9 @@ export default function Home() {
   const sendOrder = () => {
     if (!cartItems.length) return;
 
-    const table = Math.floor(Math.random() * 36);
+    const table = qrFromUrl !== '' && Number.isFinite(Number(qrFromUrl))
+      ? Math.max(0, Math.min(35, Number(qrFromUrl)))
+      : Math.floor(Math.random() * 36);
     const order = {
       id: Date.now(),
       table,
@@ -180,14 +214,115 @@ export default function Home() {
     }
 
     localStorage.setItem(key, JSON.stringify([order, ...current]));
+    sessionStorage.setItem('padaria_active_order_id', String(order.id));
+    sessionStorage.setItem('padaria_active_qr', String(table));
     window.dispatchEvent(new Event('padaria-orders-updated'));
 
+    setActiveOrder(order);
     setCart({});
     setOrderNote('');
     setCartOpen(false);
     setSentMessage(`Pedido enviado para a Mesa ${table}`);
     setTimeout(() => setSentMessage(''), 3500);
   };
+
+  const saveMarketingLead = () => {
+    const cleaned = whatsapp.replace(/\D/g, '');
+    if (cleaned.length < 10) return;
+
+    let leads = [];
+    try {
+      leads = JSON.parse(localStorage.getItem('padaria_qr_marketing_leads_v1') || '[]');
+      if (!Array.isArray(leads)) leads = [];
+    } catch {
+      leads = [];
+    }
+
+    const lead = {
+      whatsapp: cleaned,
+      qr: activeOrder?.table ?? mesa,
+      createdAt: new Date().toISOString(),
+      source: 'pos-pedido',
+    };
+
+    localStorage.setItem('padaria_qr_marketing_leads_v1', JSON.stringify([lead, ...leads]));
+    setMarketingSaved(true);
+  };
+
+  const startNewOrder = () => {
+    sessionStorage.removeItem('padaria_active_order_id');
+    sessionStorage.removeItem('padaria_active_qr');
+    setActiveOrder(null);
+    setMarketingSaved(false);
+    setWhatsapp('');
+  };
+
+  if (activeOrder) {
+    const statusIndex = activeOrder.status === 'NOVO' ? 0 : activeOrder.status === 'PREPARANDO' ? 1 : 2;
+
+    return (
+      <main>
+        <TestNav />
+        <section className="customer-status-page">
+          <div className="customer-status-card">
+            <div className="status-kicker">QR / MESA {activeOrder.table}</div>
+            <h1>
+              {activeOrder.status === 'NOVO' && 'Pedido enviado à cozinha'}
+              {activeOrder.status === 'PREPARANDO' && 'Seu pedido está em preparo'}
+              {activeOrder.status === 'PRONTO' && 'Seu pedido está pronto'}
+            </h1>
+            <p className="status-subtitle">
+              {activeOrder.status === 'NOVO' && 'Recebemos seu pedido. A equipe já consegue vê-lo no painel da padaria.'}
+              {activeOrder.status === 'PREPARANDO' && 'A equipe começou a preparar seus itens.'}
+              {activeOrder.status === 'PRONTO' && 'Tudo certo. Seu pedido foi finalizado pela equipe.'}
+            </p>
+
+            <div className="status-steps">
+              {['Enviado à cozinha', 'Em preparo', 'Pronto'].map((label, index) => (
+                <div className={`status-step ${index <= statusIndex ? 'done' : ''}`} key={label}>
+                  <div className="status-dot">{index < statusIndex ? '✓' : index + 1}</div>
+                  <span>{label}</span>
+                </div>
+              ))}
+            </div>
+
+            <div className="status-order-summary">
+              {activeOrder.items.map((item) => (
+                <div key={item.name}><strong>{item.qty}×</strong><span>{item.name}</span></div>
+              ))}
+              {activeOrder.note && <p><strong>Obs.:</strong> {activeOrder.note}</p>}
+            </div>
+
+            {activeOrder.status === 'PRONTO' && (
+              <button className="new-order-button" onClick={startNewOrder}>Fazer novo pedido</button>
+            )}
+          </div>
+
+          <aside className="whatsapp-optin">
+            <span className="optin-kicker">WHATSAPP</span>
+            <h2>Quer receber novidades da padaria?</h2>
+            <p>Combos de Natal, Dia das Mães, promoções especiais e encomendas direto pelo WhatsApp.</p>
+
+            {!marketingSaved ? (
+              <div className="optin-form">
+                <input
+                  value={whatsapp}
+                  onChange={(e) => setWhatsapp(e.target.value)}
+                  placeholder="(22) 99999-9999"
+                  inputMode="tel"
+                  aria-label="Seu WhatsApp"
+                />
+                <button onClick={saveMarketingLead}>Quero receber novidades</button>
+                <small>Opcional. Você escolhe se quer receber mensagens.</small>
+              </div>
+            ) : (
+              <div className="optin-success">Pronto. Seu WhatsApp foi cadastrado nesta versão de teste.</div>
+            )}
+          </aside>
+        </section>
+      </main>
+    );
+  }
 
   return (
     <main>
