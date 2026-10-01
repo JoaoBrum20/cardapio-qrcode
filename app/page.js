@@ -59,7 +59,7 @@ const products = [
   ['Sobremesas','Pudim',11.90,'Pudim cremoso de leite condensado.'],
   ['Sobremesas','Milk-shake Chocolate',18.90,'Milk-shake cremoso de chocolate, 400 ml.'],
   ['Sobremesas','Milk-shake Morango',18.90,'Milk-shake cremoso de morango, 400 ml.']
-].map((p, i) => ({ id: i + 1, category: p[0], name: p[1], price: p[2], description: p[3], image: '/images/smash-bacon.webp' }));
+].map((p, i) => ({ id: i + 1, category: p[0], name: p[1], price: p[2], description: p[3], image: '/images/smash-bacon.jpg' }));
 
 const money = (n) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(n);
 
