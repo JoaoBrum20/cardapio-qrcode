@@ -38,7 +38,109 @@ const initialOrders = [
     ],
     note: '',
   },
-];
+  {
+    id: 187,
+    table: 5,
+    time: '14:49',
+    status: 'NOVO',
+    items: [
+      { name: 'Café expresso', qty: 2 },
+      { name: 'Pão de queijo grande', qty: 1 },
+      { name: 'Bolo de cenoura com chocolate', qty: 1 },
+    ],
+    note: 'Café sem açúcar',
+  },
+  {
+    id: 188,
+    table: 9,
+    time: '14:52',
+    status: 'PREPARANDO',
+    items: [
+      { name: 'Pão com ovo e queijo', qty: 2 },
+      { name: 'Suco de maracujá', qty: 1 },
+    ],
+    note: '',
+  },
+  {
+    id: 189,
+    table: 2,
+    time: '14:56',
+    status: 'NOVO',
+    items: [
+      { name: 'Coxinha com catupiry', qty: 4 },
+      { name: 'Refrigerante lata', qty: 2 },
+    ],
+    note: '2 refrigerantes sem gelo',
+  },
+  {
+    id: 190,
+    table: 15,
+    time: '15:01',
+    status: 'PRONTO',
+    items: [
+      { name: 'Cappuccino tradicional', qty: 2 },
+      { name: 'Croissant de queijo', qty: 2 },
+    ],
+    note: '',
+  },
+  {
+    id: 191,
+    table: 4,
+    time: '15:04',
+    status: 'NOVO',
+    items: [
+      { name: 'Tapioca de queijo', qty: 1 },
+      { name: 'Café coado', qty: 1 },
+      { name: 'Água mineral', qty: 1 },
+    ],
+    note: 'Tapioca bem passada',
+  },
+  {
+    id: 192,
+    table: 11,
+    time: '15:08',
+    status: 'PREPARANDO',
+    items: [
+      { name: 'X-Burguer', qty: 2 },
+      { name: 'Batata frita', qty: 1 },
+      { name: 'Refrigerante 600 ml', qty: 2 },
+    ],
+    note: 'Sem cebola',
+  },
+  {
+    id: 193,
+    table: 8,
+    time: '15:12',
+    status: 'NOVO',
+    items: [
+      { name: 'Pudim', qty: 2 },
+      { name: 'Café com leite', qty: 2 },
+    ],
+    note: '',
+  },
+  {
+    id: 194,
+    table: 6,
+    time: '15:15',
+    status: 'PRONTO',
+    items: [
+      { name: 'Omelete com queijo', qty: 1 },
+      { name: 'Suco de laranja', qty: 1 },
+    ],
+    note: 'Sem sal',
+  },
+  {
+    id: 195,
+    table: 10,
+    time: '15:18',
+    status: 'NOVO',
+    items: [
+      { name: 'Misto quente', qty: 3 },
+      { name: 'Chocolate quente', qty: 2 },
+    ],
+    note: 'Cortar os mistos ao meio',
+  },
+]
 
 const orderFlow = ['NOVO', 'PREPARANDO', 'PRONTO', 'ENTREGUE'];
 
