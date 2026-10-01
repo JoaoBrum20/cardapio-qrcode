@@ -1153,3 +1153,13 @@
   .cart-item-image{width:48px;height:48px}
   .cart-item>.stepper{grid-column:2;margin-top:6px;justify-self:start}
 }
+
+
+/* Carrinho acima da navegação */
+.overlay{
+  z-index:80;
+}
+.cart-panel{
+  position:relative;
+  z-index:81;
+}
