@@ -1,10 +1,10 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import TestNav from '../../components/TestNav';
 import styles from './Pedidos.module.css';
 
-const initialOrders = [
+const demoOrders = [
   { id:184, table:12, status:'NOVO', items:[{name:'Café com leite',qty:2},{name:'Pão na chapa',qty:1},{name:'Coxinha de frango',qty:3}], note:'1 café sem açúcar' },
   { id:185, table:7, status:'NOVO', items:[{name:'Cappuccino tradicional',qty:1},{name:'Pão de queijo grande',qty:2}], note:'Aquecer bem' },
   { id:186, table:3, status:'PREPARANDO', items:[{name:'Misto quente',qty:2},{name:'Suco de laranja',qty:2}], note:'' },
@@ -19,9 +19,46 @@ const initialOrders = [
   { id:195, table:10, status:'NOVO', items:[{name:'Misto quente',qty:3},{name:'Chocolate quente',qty:2}], note:'Cortar os mistos ao meio' },
 ];
 
+const STORAGE_KEY = 'padaria_qr_orders_v1';
+
+const readStoredOrders = () => {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+};
+
 export default function PedidosPage() {
-  const [orders, setOrders] = useState(initialOrders);
+  const [orders, setOrders] = useState(demoOrders);
   const [selected, setSelected] = useState(null);
+
+  useEffect(() => {
+    const syncOrders = () => {
+      const stored = readStoredOrders();
+      setOrders([
+        ...stored,
+        ...demoOrders.filter((demo) => !stored.some((order) => order.id === demo.id)),
+      ]);
+    };
+
+    syncOrders();
+    window.addEventListener('storage', syncOrders);
+    window.addEventListener('padaria-orders-updated', syncOrders);
+    const interval = window.setInterval(syncOrders, 1500);
+
+    return () => {
+      window.removeEventListener('storage', syncOrders);
+      window.removeEventListener('padaria-orders-updated', syncOrders);
+      window.clearInterval(interval);
+    };
+  }, []);
+
+  const persistStoredOrders = (nextOrders) => {
+    const storedOnly = nextOrders.filter((order) => order.persisted);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(storedOnly));
+  };
 
   const activeOrders = useMemo(
     () => orders.filter((o) => o.status !== 'PRONTO').sort((a,b) => b.id - a.id),
@@ -29,11 +66,20 @@ export default function PedidosPage() {
   );
 
   const prepare = (id) => {
-    setOrders((current) => current.map((o) => o.id === id ? {...o, status:'PREPARANDO'} : o));
+    setOrders((current) => {
+      const next = current.map((o) => o.id === id ? {...o, status:'PREPARANDO'} : o);
+      persistStoredOrders(next);
+      return next;
+    });
+    setSelected((current) => current?.id === id ? {...current, status:'PREPARANDO'} : current);
   };
 
   const finish = (id) => {
-    setOrders((current) => current.map((o) => o.id === id ? {...o, status:'PRONTO'} : o));
+    setOrders((current) => {
+      const next = current.map((o) => o.id === id ? {...o, status:'PRONTO'} : o);
+      persistStoredOrders(next);
+      return next;
+    });
     setSelected(null);
   };
 
