@@ -142,6 +142,10 @@ export default function Home() {
   const [whatsapp, setWhatsapp] = useState('');
   const [marketingSaved, setMarketingSaved] = useState(false);
   const [showTracking, setShowTracking] = useState(true);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [detailQty, setDetailQty] = useState(1);
+  const [detailNote, setDetailNote] = useState('');
+  const [itemNotes, setItemNotes] = useState({});
 
   const params = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
   const qrFromUrl = params?.get('qr') || params?.get('mesa') || '';
@@ -188,13 +192,28 @@ export default function Home() {
   }, [category, query]);
 
   const add = (id) => setCart((c) => ({ ...c, [id]: (c[id] || 0) + 1 }));
+
+  const openProduct = (product) => {
+    setSelectedProduct(product);
+    setDetailQty(Math.max(1, cart[product.id] || 1));
+    setDetailNote(itemNotes[product.id] || '');
+  };
+
+  const addFromDetail = () => {
+    if (!selectedProduct) return;
+    setCart((current) => ({ ...current, [selectedProduct.id]: detailQty }));
+    setItemNotes((current) => ({ ...current, [selectedProduct.id]: detailNote.trim() }));
+    setSelectedProduct(null);
+  };
   const remove = (id) => setCart((c) => {
     const next = { ...c };
     if ((next[id] || 0) <= 1) delete next[id]; else next[id] -= 1;
     return next;
   });
 
-  const cartItems = products.filter((p) => cart[p.id]).map((p) => ({ ...p, qty: cart[p.id] }));
+  const cartItems = products
+    .filter((p) => cart[p.id])
+    .map((p) => ({ ...p, qty: cart[p.id], itemNote: itemNotes[p.id] || '' }));
   const totalQty = cartItems.reduce((s, p) => s + p.qty, 0);
   const total = cartItems.reduce((s, p) => s + p.qty * p.price, 0);
 
@@ -208,7 +227,7 @@ export default function Home() {
     try {
       const created = await criarPedido({
         qrNumero: table,
-        itens: cartItems.map((p) => ({ name: p.name, qty: p.qty })),
+        itens: cartItems.map((p) => ({ name: p.name, qty: p.qty, note: p.itemNote || '' })),
         observacao: orderNote.trim(),
         total,
       });
@@ -218,7 +237,7 @@ export default function Home() {
         token: created.pedido_token,
         table: created.qr_numero,
         status: created.pronto ? 'PRONTO' : created.preparando ? 'PREPARANDO' : 'NOVO',
-        items: cartItems.map((p) => ({ name: p.name, qty: p.qty })),
+        items: cartItems.map((p) => ({ name: p.name, qty: p.qty, note: p.itemNote || '' })),
         note: orderNote.trim(),
         total,
         createdAt: created.criado_em,
@@ -397,7 +416,7 @@ export default function Home() {
           {visible.map((p) => {
             const qty = cart[p.id] || 0;
             return (
-              <article className="card" key={p.id}>
+              <article className="card product-card-clickable" key={p.id} onClick={() => openProduct(p)} tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') openProduct(p); }}>
                 <div className="product-mark" aria-hidden="true"><span>{p.name.slice(0,1)}</span></div>
                 <div className="card-body">
                   <div className="category-label">{p.category}</div>
@@ -406,12 +425,12 @@ export default function Home() {
                   <div className="card-footer">
                     <strong>{money(p.price)}</strong>
                     {qty === 0 ? (
-                      <button className="add-btn" onClick={() => add(p.id)}>Adicionar</button>
+                      <button className="add-btn" onClick={(e) => { e.stopPropagation(); openProduct(p); }}>Ver detalhes</button>
                     ) : (
                       <div className="stepper">
-                        <button aria-label={`Remover ${p.name}`} onClick={() => remove(p.id)}>−</button>
+                        <button aria-label={`Remover ${p.name}`} onClick={(e) => { e.stopPropagation(); remove(p.id); }}>−</button>
                         <span>{qty}</span>
-                        <button aria-label={`Adicionar ${p.name}`} onClick={() => add(p.id)}>+</button>
+                        <button aria-label={`Adicionar ${p.name}`} onClick={(e) => { e.stopPropagation(); add(p.id); }}>+</button>
                       </div>
                     )}
                   </div>
@@ -437,6 +456,45 @@ export default function Home() {
 
       {sentMessage && <div className="order-success">{sentMessage}</div>}
 
+      {selectedProduct && (
+        <div className="product-detail-overlay" onMouseDown={(e) => { if (e.target === e.currentTarget) setSelectedProduct(null); }}>
+          <section className="product-detail-modal" role="dialog" aria-modal="true" aria-label={selectedProduct.name}>
+            <button className="product-detail-close" onClick={() => setSelectedProduct(null)} aria-label="Fechar">×</button>
+
+            <div className="product-detail-image" aria-hidden="true">
+              <span>{selectedProduct.name.slice(0,1)}</span>
+            </div>
+
+            <div className="product-detail-content">
+              <span className="product-detail-category">{selectedProduct.category}</span>
+              <h2>{selectedProduct.name}</h2>
+              <p>{selectedProduct.description}</p>
+              <strong className="product-detail-price">{money(selectedProduct.price)}</strong>
+
+              <label className="product-detail-note">
+                Observação deste item
+                <textarea
+                  value={detailNote}
+                  onChange={(e) => setDetailNote(e.target.value)}
+                  placeholder="Ex.: sem cebola, bem passado, sem açúcar..."
+                />
+              </label>
+
+              <div className="product-detail-bottom">
+                <div className="product-detail-stepper">
+                  <button onClick={() => setDetailQty((q) => Math.max(1, q - 1))}>−</button>
+                  <strong>{detailQty}</strong>
+                  <button onClick={() => setDetailQty((q) => q + 1)}>+</button>
+                </div>
+                <button className="product-detail-add" onClick={addFromDetail}>
+                  {cart[selectedProduct.id] ? 'Atualizar item' : 'Adicionar'} · {money(selectedProduct.price * detailQty)}
+                </button>
+              </div>
+            </div>
+          </section>
+        </div>
+      )}
+
       {cartOpen && (
         <div className="overlay" onMouseDown={(e) => { if (e.target === e.currentTarget) setCartOpen(false); }}>
           <aside className="cart-panel" role="dialog" aria-modal="true" aria-label="Seu pedido">
@@ -447,7 +505,7 @@ export default function Home() {
             <div className="cart-list">
               {cartItems.map((p) => (
                 <div className="cart-item" key={p.id}>
-                  <div><strong>{p.name}</strong><span>{money(p.price)} cada</span></div>
+                  <div><strong>{p.name}</strong><span>{money(p.price)} cada</span>{p.itemNote && <small className="cart-item-note">Obs.: {p.itemNote}</small>}</div>
                   <div className="stepper">
                     <button onClick={() => remove(p.id)}>−</button><span>{p.qty}</span><button onClick={() => add(p.id)}>+</button>
                   </div>
