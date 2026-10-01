@@ -143,22 +143,16 @@ const initialOrders = [
 ]
 
 
-const PAGE_SIZE = 8;
 
 export default function PedidosPage() {
   const [orders, setOrders] = useState(initialOrders);
-  const [page, setPage] = useState(1);
 
   const activeOrders = useMemo(
-    () => orders.filter((order) => order.status !== 'ENTREGUE'),
+    () =>
+      orders
+        .filter((order) => order.status !== 'ENTREGUE')
+        .sort((a, b) => b.id - a.id),
     [orders]
-  );
-
-  const totalPages = Math.max(1, Math.ceil(activeOrders.length / PAGE_SIZE));
-  const currentPage = Math.min(page, totalPages);
-  const pageOrders = activeOrders.slice(
-    (currentPage - 1) * PAGE_SIZE,
-    currentPage * PAGE_SIZE
   );
 
   const markReady = (id) => {
@@ -181,9 +175,9 @@ export default function PedidosPage() {
         </div>
       </header>
 
-      <section className="orders-grid">
-        {pageOrders.map((order) => (
-          <article className={`order-card ${order.status === 'PRONTO' ? 'is-ready' : ''}`} key={order.id}>
+      <section className="orders-strip" aria-label="Pedidos em ordem do mais novo para o mais antigo">
+        {activeOrders.map((order) => (
+          <article className={`order-column ${order.status === 'PRONTO' ? 'is-ready' : ''}`} key={order.id}>
             <div className="order-table-head">
               <h2>Mesa {order.table}</h2>
             </div>
@@ -218,24 +212,6 @@ export default function PedidosPage() {
           </article>
         ))}
       </section>
-
-      <div className="orders-pagination">
-        <button
-          onClick={() => setPage((p) => Math.max(1, p - 1))}
-          disabled={currentPage === 1}
-        >
-          Anterior
-        </button>
-
-        <span>Página {currentPage} de {totalPages}</span>
-
-        <button
-          onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-          disabled={currentPage === totalPages}
-        >
-          Próxima
-        </button>
-      </div>
 
       {activeOrders.length === 0 && (
         <div className="orders-empty">
