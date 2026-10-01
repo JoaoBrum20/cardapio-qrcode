@@ -97,3 +97,121 @@
     border-radius:6px;
   }
 }
+
+/* Pedidos: layout de 8 por página */
+.orders-grid{
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  grid-template-rows:repeat(2,minmax(0,1fr));
+}
+.order-card{
+  padding:0;
+  overflow:hidden;
+}
+.order-table-head{
+  background:#4b2d1d;
+  color:#fff;
+  padding:10px 14px;
+}
+.order-table-head h2{
+  margin:0;
+  font-family:Georgia,serif;
+  font-size:22px;
+  line-height:1;
+}
+.order-card-content{
+  padding:14px;
+  display:flex;
+  flex-direction:column;
+  min-height:0;
+  height:100%;
+}
+.order-footer{
+  justify-content:flex-end;
+}
+.ready-button{
+  width:100%;
+}
+.ready-button:disabled{
+  background:#d9d9d9;
+  color:#555;
+  cursor:default;
+}
+.order-card.is-ready .order-table-head{
+  background:#6b6b6b;
+}
+.orders-pagination{
+  max-width:1500px;
+  margin:12px auto 0;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:12px;
+}
+.orders-pagination button{
+  border:1px solid #d8d2c9;
+  background:#fff;
+  border-radius:8px;
+  padding:7px 12px;
+  font-weight:700;
+  cursor:pointer;
+}
+.orders-pagination button:disabled{
+  opacity:.4;
+  cursor:default;
+}
+.orders-pagination span{
+  font-size:12px;
+  color:#666;
+}
+@media (min-width:1200px){
+  .orders-grid{
+    height:calc(100vh - 152px);
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    grid-template-rows:repeat(2,minmax(0,1fr));
+    gap:10px;
+  }
+  .order-card{
+    min-height:0;
+    height:100%;
+  }
+  .order-table-head{
+    padding:8px 12px;
+  }
+  .order-table-head h2{
+    font-size:18px;
+  }
+  .order-card-content{
+    padding:10px 12px;
+  }
+  .order-item{
+    grid-template-columns:30px 1fr;
+    font-size:13px;
+  }
+  .item-qty{
+    font-size:14px;
+  }
+  .order-note{
+    margin-top:8px;
+  }
+  .order-footer{
+    padding-top:8px;
+  }
+  .ready-button{
+    padding:7px 8px!important;
+    font-size:10px!important;
+  }
+  .orders-pagination{
+    margin-top:8px;
+  }
+}
+@media(max-width:1199px){
+  .orders-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    grid-template-rows:auto;
+  }
+}
+@media(max-width:700px){
+  .orders-grid{
+    grid-template-columns:1fr;
+  }
+}
