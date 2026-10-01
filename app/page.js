@@ -2,14 +2,14 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import TestNav from '../components/TestNav';
-import { buscarStatusPedido, criarPedido } from '../lib/padariaSupabase';
+import { buscarProdutos, buscarStatusPedido, criarPedido } from '../lib/padariaSupabase';
 
 const categories = [
   'Todos', 'Mais pedidos', 'Smash Burgers', 'Burgers Artesanais', 'Combos',
   'Batatas e Porções', 'Molhos e Extras', 'Bebidas', 'Sobremesas'
 ];
 
-const products = [
+const fallbackProductRows = [
   ['Mais pedidos','Smash Bacon',27.90,'Pão brioche, blend bovino 100g, cheddar, bacon crocante, cebola caramelizada e molho da casa.'],
   ['Mais pedidos','Duplo Cheddar',32.90,'Pão brioche, 2 blends bovinos de 100g, cheddar em dobro, picles e molho especial.'],
   ['Mais pedidos','Burger da Casa',34.90,'Pão brioche, blend 160g, queijo, bacon, cebola caramelizada, alface, tomate e molho da casa.'],
@@ -103,7 +103,7 @@ const productImages = {
   'Milk-shake Morango': '/images/milkshake.png',
 };
 
-const productsWithImages = products.map((p, i) => ({
+const fallbackProducts = fallbackProductRows.map((p, i) => ({
   id: i + 1,
   category: p[0],
   name: p[1],
@@ -115,6 +115,7 @@ const productsWithImages = products.map((p, i) => ({
 const money = (n) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(n);
 
 export default function Home() {
+  const [products, setProducts] = useState(fallbackProducts);
   const [category, setCategory] = useState('Todos');
   const [query, setQuery] = useState('');
   const [cart, setCart] = useState({});
@@ -133,6 +134,25 @@ export default function Home() {
   const params = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
   const qrFromUrl = params?.get('qr') || params?.get('mesa') || '';
   const mesa = activeOrder?.table ?? (qrFromUrl || '—');
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadProducts = async () => {
+      try {
+        const data = await buscarProdutos();
+        if (!cancelled && data.length) setProducts(data);
+      } catch (error) {
+        console.error('Erro ao carregar produtos:', error);
+      }
+    };
+
+    loadProducts();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -171,8 +191,8 @@ export default function Home() {
 
   const visible = useMemo(() => {
     const term = query.trim().toLowerCase();
-    return productsWithImages.filter((p) => (category === 'Todos' || p.category === category) && (!term || p.name.toLowerCase().includes(term)));
-  }, [category, query]);
+    return products.filter((p) => (category === 'Todos' || p.category === category) && (!term || p.name.toLowerCase().includes(term)));
+  }, [category, query, products]);
 
   const add = (id) => setCart((c) => ({ ...c, [id]: (c[id] || 0) + 1 }));
 
@@ -194,7 +214,7 @@ export default function Home() {
     return next;
   });
 
-  const cartItems = productsWithImages
+  const cartItems = products
     .filter((p) => cart[p.id])
     .map((p) => ({ ...p, qty: cart[p.id], itemNote: itemNotes[p.id] || '' }));
   const totalQty = cartItems.reduce((s, p) => s + p.qty, 0);
