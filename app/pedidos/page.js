@@ -3,68 +3,68 @@
 import { useEffect, useMemo, useState } from 'react';
 import TestNav from '../../components/TestNav';
 import styles from './Pedidos.module.css';
+import { finalizarPedido, listarPedidosAtivos, prepararPedido } from '../../lib/padariaSupabase';
 
 
-
-const STORAGE_KEY = 'padaria_qr_orders_v1';
-
-const readStoredOrders = () => {
-  try {
-    const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
-  }
-};
 
 export default function PedidosPage() {
   const [orders, setOrders] = useState([]);
   const [selected, setSelected] = useState(null);
 
   useEffect(() => {
-    const syncOrders = () => {
-      const stored = readStoredOrders();
-      setOrders(stored);
+    let cancelled = false;
+
+    const syncOrders = async () => {
+      try {
+        const rows = await listarPedidosAtivos();
+        if (cancelled) return;
+
+        setOrders(rows.map((row) => ({
+          id: row.id,
+          table: row.qr_numero,
+          status: row.preparando ? 'PREPARANDO' : 'NOVO',
+          items: Array.isArray(row.itens) ? row.itens : [],
+          note: row.observacao || '',
+          total: Number(row.total || 0),
+          createdAt: row.criado_em,
+        })));
+      } catch (error) {
+        console.error('Erro ao carregar pedidos:', error);
+      }
     };
 
     syncOrders();
-    window.addEventListener('storage', syncOrders);
-    window.addEventListener('padaria-orders-updated', syncOrders);
-    const interval = window.setInterval(syncOrders, 1500);
+    const interval = window.setInterval(syncOrders, 1200);
 
     return () => {
-      window.removeEventListener('storage', syncOrders);
-      window.removeEventListener('padaria-orders-updated', syncOrders);
+      cancelled = true;
       window.clearInterval(interval);
     };
   }, []);
-
-  const persistStoredOrders = (nextOrders) => {
-    const storedOnly = nextOrders.filter((order) => order.persisted);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(storedOnly));
-  };
 
   const activeOrders = useMemo(
     () => orders.filter((o) => o.status !== 'PRONTO').sort((a,b) => b.id - a.id),
     [orders]
   );
 
-  const prepare = (id) => {
-    setOrders((current) => {
-      const next = current.map((o) => o.id === id ? {...o, status:'PREPARANDO'} : o);
-      persistStoredOrders(next);
-      return next;
-    });
-    setSelected((current) => current?.id === id ? {...current, status:'PREPARANDO'} : current);
+  const prepare = async (id) => {
+    try {
+      await prepararPedido(id);
+      setOrders((current) => current.map((o) => o.id === id ? {...o, status:'PREPARANDO'} : o));
+      setSelected((current) => current?.id === id ? {...current, status:'PREPARANDO'} : current);
+    } catch (error) {
+      console.error('Erro ao preparar pedido:', error);
+    }
   };
 
-  const finish = (id) => {
-    setOrders((current) => {
-      const next = current.map((o) => o.id === id ? {...o, status:'PRONTO'} : o);
-      persistStoredOrders(next);
-      return next;
-    });
-    setSelected(null);
+  const finish = async (id) => {
+    try {
+      await finalizarPedido(id);
+      setOrders((current) => current.filter((o) => o.id !== id));
+      setSelected(null);
+    } catch (error) {
+      console.error('Erro ao finalizar pedido:', error);
+    }
   };
 
   const action = (order, event) => {
