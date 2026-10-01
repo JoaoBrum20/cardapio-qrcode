@@ -135,6 +135,8 @@ export default function Home() {
   const [query, setQuery] = useState('');
   const [cart, setCart] = useState({});
   const [cartOpen, setCartOpen] = useState(false);
+  const [orderNote, setOrderNote] = useState('');
+  const [sentMessage, setSentMessage] = useState('');
 
   const mesa = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('mesa') || '12' : '12';
 
@@ -153,6 +155,39 @@ export default function Home() {
   const cartItems = products.filter((p) => cart[p.id]).map((p) => ({ ...p, qty: cart[p.id] }));
   const totalQty = cartItems.reduce((s, p) => s + p.qty, 0);
   const total = cartItems.reduce((s, p) => s + p.qty * p.price, 0);
+
+  const sendOrder = () => {
+    if (!cartItems.length) return;
+
+    const table = Math.floor(Math.random() * 36);
+    const order = {
+      id: Date.now(),
+      table,
+      status: 'NOVO',
+      items: cartItems.map((p) => ({ name: p.name, qty: p.qty })),
+      note: orderNote.trim(),
+      createdAt: new Date().toISOString(),
+      persisted: true,
+    };
+
+    const key = 'padaria_qr_orders_v1';
+    let current = [];
+    try {
+      current = JSON.parse(localStorage.getItem(key) || '[]');
+      if (!Array.isArray(current)) current = [];
+    } catch {
+      current = [];
+    }
+
+    localStorage.setItem(key, JSON.stringify([order, ...current]));
+    window.dispatchEvent(new Event('padaria-orders-updated'));
+
+    setCart({});
+    setOrderNote('');
+    setCartOpen(false);
+    setSentMessage(`Pedido enviado para a Mesa ${table}`);
+    setTimeout(() => setSentMessage(''), 3500);
+  };
 
   return (
     <main>
@@ -233,6 +268,8 @@ export default function Home() {
         </button>
       )}
 
+      {sentMessage && <div className="order-success">{sentMessage}</div>}
+
       {cartOpen && (
         <div className="overlay" onMouseDown={(e) => { if (e.target === e.currentTarget) setCartOpen(false); }}>
           <aside className="cart-panel" role="dialog" aria-modal="true" aria-label="Seu pedido">
@@ -250,10 +287,10 @@ export default function Home() {
                 </div>
               ))}
             </div>
-            <label className="notes">Observações do pedido<textarea placeholder="Ex.: café sem açúcar, cortar sanduíche ao meio..." /></label>
+            <label className="notes">Observações do pedido<textarea value={orderNote} onChange={(e) => setOrderNote(e.target.value)} placeholder="Ex.: café sem açúcar, cortar sanduíche ao meio..." /></label>
             <div className="total"><span>Total</span><strong>{money(total)}</strong></div>
-            <button className="send" onClick={() => alert('Nesta primeira publicação o cardápio e o carrinho já funcionam. O envio real para a tela da padaria será ligado na próxima etapa com o banco de pedidos.')}>Enviar pedido</button>
-            <p className="demo-note">Primeira versão: cardápio e carrinho. Integração com a tela da padaria entra na próxima etapa.</p>
+            <button className="send" onClick={sendOrder}>Enviar pedido</button>
+            <p className="demo-note">Versão de teste: a mesa é gerada aleatoriamente entre 0 e 35.</p>
           </aside>
         </div>
       )}
