@@ -5,128 +5,60 @@ import TestNav from '../components/TestNav';
 import { buscarStatusPedido, criarPedido } from '../lib/padariaSupabase';
 
 const categories = [
-  'Todos', 'Cafés', 'Pães e Torradas', 'Lanches', 'Salgados', 'Pães de Queijo',
-  'Sanduíches Naturais', 'Tapiocas', 'Omeletes', 'Combos', 'Bolos',
-  'Doces e Sobremesas', 'Croissants e Folhados', 'Sucos Naturais',
-  'Vitaminas', 'Bebidas', 'Porções'
+  'Todos', 'Mais pedidos', 'Smash Burgers', 'Burgers Artesanais', 'Combos',
+  'Batatas e Porções', 'Molhos e Extras', 'Bebidas', 'Sobremesas'
 ];
 
 const products = [
-  ['Cafés','Café expresso',7.00,'Café intenso, servido na hora.'],
-  ['Cafés','Café coado',6.30,'Tradicional e fresquinho.'],
-  ['Cafés','Café com leite',9.80,'Café coado com leite quente.'],
-  ['Cafés','Cappuccino tradicional',12.60,'Café, leite cremoso e canela.'],
-  ['Cafés','Cappuccino com chocolate',14.00,'Cappuccino cremoso com chocolate.'],
-  ['Cafés','Mocaccino',15.40,'Café, leite e chocolate.'],
-  ['Cafés','Café gelado',14.00,'Café refrescante servido gelado.'],
-  ['Cafés','Latte',12.60,'Café suave com bastante leite.'],
-  ['Cafés','Chocolate quente',14.00,'Chocolate quente e cremoso.'],
-  ['Pães e Torradas','Pão francês',1.68,'Pão francês tradicional.'],
-  ['Pães e Torradas','Pão francês com manteiga',6.30,'Pão francês com manteiga.'],
-  ['Pães e Torradas','Pão na chapa',7.70,'Dourado na chapa.'],
-  ['Pães e Torradas','Pão com requeijão',8.40,'Pão francês com requeijão.'],
-  ['Pães e Torradas','Pão com manteiga na chapa',8.40,'Pão crocante com manteiga.'],
-  ['Pães e Torradas','Pão integral',3.50,'Opção integral.'],
-  ['Pães e Torradas','Torradas com manteiga',9.10,'Torradas crocantes.'],
-  ['Pães e Torradas','Cesta de pães',16.80,'Seleção de pães da casa.'],
-  ['Lanches','Misto quente',14.00,'Presunto e queijo na chapa.'],
-  ['Lanches','Queijo quente',12.60,'Sanduíche quente de queijo.'],
-  ['Lanches','Presunto e queijo',14.00,'Clássico da padaria.'],
-  ['Lanches','Pão com ovo',11.20,'Pão francês com ovo.'],
-  ['Lanches','Pão com ovo e queijo',14.00,'Ovo e queijo derretido.'],
-  ['Lanches','Pão com linguiça',16.80,'Linguiça grelhada no pão.'],
-  ['Lanches','Pão com carne',19.60,'Carne grelhada no pão.'],
-  ['Lanches','X-Burguer',21.00,'Hambúrguer e queijo.'],
-  ['Lanches','X-Salada',23.80,'Hambúrguer, queijo e salada.'],
-  ['Lanches','X-Bacon',26.60,'Hambúrguer, queijo e bacon.'],
-  ['Lanches','Bauru',22.40,'Presunto, queijo, tomate e orégano.'],
-  ['Salgados','Coxinha de frango',9.80,'Coxinha tradicional de frango.'],
-  ['Salgados','Coxinha com catupiry',11.20,'Frango com recheio cremoso.'],
-  ['Salgados','Quibe',9.80,'Quibe frito tradicional.'],
-  ['Salgados','Risole de queijo',9.80,'Risole crocante de queijo.'],
-  ['Salgados','Risole de presunto e queijo',10.50,'Presunto e queijo.'],
-  ['Salgados','Enroladinho de salsicha',9.80,'Enroladinho assado.'],
-  ['Salgados','Pastel assado de frango',11.20,'Pastel assado com frango.'],
-  ['Salgados','Pastel assado de carne',11.20,'Pastel assado com carne.'],
-  ['Salgados','Empada de frango',11.90,'Empada amanteigada de frango.'],
-  ['Salgados','Empada de palmito',12.60,'Empada de palmito.'],
-  ['Salgados','Esfiha de carne',11.20,'Esfiha assada de carne.'],
-  ['Salgados','Esfiha de frango',11.20,'Esfiha assada de frango.'],
-  ['Pães de Queijo','Pão de queijo pequeno',4.20,'Pão de queijo tradicional.'],
-  ['Pães de Queijo','Pão de queijo grande',8.40,'Porção individual maior.'],
-  ['Pães de Queijo','Pão de queijo com requeijão',11.20,'Recheado com requeijão.'],
-  ['Pães de Queijo','Pão de queijo com peito de peru',14.00,'Recheado com peito de peru.'],
-  ['Sanduíches Naturais','Frango com cenoura',16.80,'Frango desfiado e cenoura.'],
-  ['Sanduíches Naturais','Peito de peru com queijo',18.20,'Peito de peru e queijo.'],
-  ['Sanduíches Naturais','Atum',19.60,'Sanduíche natural de atum.'],
-  ['Sanduíches Naturais','Frango com cream cheese',19.60,'Frango e cream cheese.'],
-  ['Sanduíches Naturais','Vegetariano',16.80,'Vegetais frescos e queijo.'],
-  ['Tapiocas','Tapioca com manteiga',11.20,'Tapioca simples com manteiga.'],
-  ['Tapiocas','Tapioca de queijo',14.00,'Queijo derretido.'],
-  ['Tapiocas','Tapioca de presunto e queijo',16.80,'Presunto e queijo.'],
-  ['Tapiocas','Tapioca de frango com requeijão',19.60,'Frango e requeijão.'],
-  ['Tapiocas','Tapioca de carne seca com queijo',22.40,'Carne seca e queijo.'],
-  ['Tapiocas','Tapioca de banana com canela',15.40,'Banana e canela.'],
-  ['Omeletes','Omelete simples',14.00,'Omelete tradicional.'],
-  ['Omeletes','Omelete com queijo',16.80,'Omelete com queijo.'],
-  ['Omeletes','Omelete de presunto e queijo',19.60,'Presunto e queijo.'],
-  ['Omeletes','Omelete de frango',21.00,'Frango desfiado.'],
-  ['Omeletes','Omelete completo',25.20,'Ovo, queijo, presunto e acompanhamentos.'],
-  ['Combos','Café + pão com manteiga',12.60,'Combo clássico.'],
-  ['Combos','Café com leite + pão na chapa',15.40,'Café com leite e pão na chapa.'],
-  ['Combos','Café + misto quente',19.60,'Café e misto quente.'],
-  ['Combos','Cappuccino + pão de queijo',18.20,'Cappuccino e pão de queijo.'],
-  ['Combos','Suco + misto quente',22.40,'Suco natural e misto quente.'],
-  ['Combos','Café da manhã completo',33.60,'Café, pão, ovos e suco.'],
-  ['Bolos','Bolo de cenoura com chocolate',11.20,'Fatia de bolo com cobertura.'],
-  ['Bolos','Bolo de chocolate',11.20,'Fatia de bolo de chocolate.'],
-  ['Bolos','Bolo de laranja',9.80,'Fatia de bolo de laranja.'],
-  ['Bolos','Bolo de fubá',9.80,'Fatia de bolo de fubá.'],
-  ['Bolos','Bolo de milho',11.20,'Fatia de bolo de milho.'],
-  ['Bolos','Bolo de coco',11.20,'Fatia de bolo de coco.'],
-  ['Bolos','Bolo de banana',11.20,'Fatia de bolo de banana.'],
-  ['Bolos','Fatia de bolo recheado',16.80,'Consulte o sabor do dia.'],
-  ['Doces e Sobremesas','Brigadeiro',5.60,'Brigadeiro tradicional.'],
-  ['Doces e Sobremesas','Beijinho',5.60,'Beijinho tradicional.'],
-  ['Doces e Sobremesas','Pudim',11.20,'Fatia de pudim.'],
-  ['Doces e Sobremesas','Quindim',9.80,'Quindim individual.'],
-  ['Doces e Sobremesas','Torta de limão',14.00,'Fatia de torta de limão.'],
-  ['Doces e Sobremesas','Torta de chocolate',15.40,'Fatia de torta de chocolate.'],
-  ['Doces e Sobremesas','Cheesecake',16.80,'Fatia de cheesecake.'],
-  ['Doces e Sobremesas','Brownie',12.60,'Brownie de chocolate.'],
-  ['Doces e Sobremesas','Sonho de creme',9.80,'Sonho recheado com creme.'],
-  ['Doces e Sobremesas','Sonho de doce de leite',9.80,'Sonho recheado com doce de leite.'],
-  ['Croissants e Folhados','Croissant simples',11.20,'Croissant amanteigado.'],
-  ['Croissants e Folhados','Croissant de queijo',14.00,'Croissant recheado com queijo.'],
-  ['Croissants e Folhados','Croissant de presunto e queijo',16.80,'Presunto e queijo.'],
-  ['Croissants e Folhados','Croissant de chocolate',15.40,'Croissant recheado com chocolate.'],
-  ['Croissants e Folhados','Folhado de frango',12.60,'Massa folhada com frango.'],
-  ['Croissants e Folhados','Folhado de queijo',12.60,'Massa folhada com queijo.'],
-  ['Sucos Naturais','Suco de laranja',12.60,'Suco natural.'],
-  ['Sucos Naturais','Suco de limão',11.20,'Suco natural.'],
-  ['Sucos Naturais','Suco de abacaxi',12.60,'Suco natural.'],
-  ['Sucos Naturais','Suco de maracujá',12.60,'Suco natural.'],
-  ['Sucos Naturais','Suco de acerola',12.60,'Suco natural.'],
-  ['Sucos Naturais','Suco de manga',14.00,'Suco natural.'],
-  ['Sucos Naturais','Suco de morango',15.40,'Suco natural.'],
-  ['Sucos Naturais','Laranja com acerola',15.40,'Mistura natural.'],
-  ['Vitaminas','Vitamina de banana',14.00,'Batida com leite.'],
-  ['Vitaminas','Vitamina de mamão',14.00,'Batida com leite.'],
-  ['Vitaminas','Vitamina de morango',16.80,'Batida com leite.'],
-  ['Vitaminas','Vitamina de abacate',16.80,'Batida cremosa.'],
-  ['Vitaminas','Banana com aveia',16.80,'Vitamina de banana com aveia.'],
-  ['Bebidas','Água mineral',5.60,'Água sem gás.'],
-  ['Bebidas','Água com gás',7.00,'Água gaseificada.'],
-  ['Bebidas','Refrigerante lata',8.40,'Consulte sabores.'],
-  ['Bebidas','Refrigerante 600 ml',11.20,'Consulte sabores.'],
-  ['Bebidas','Chá gelado',9.80,'Chá gelado.'],
-  ['Bebidas','Água de coco',11.20,'Água de coco.'],
-  ['Bebidas','Energético',16.80,'Lata.'],
-  ['Porções','Batata frita',25.20,'Porção de batatas fritas.'],
-  ['Porções','Aipim frito',25.20,'Porção de aipim frito.'],
-  ['Porções','Calabresa acebolada',30.80,'Calabresa com cebola.'],
-  ['Porções','Mini salgados',35.00,'Porção variada.'],
-  ['Porções','Porção de pão de queijo',28.00,'Pães de queijo para compartilhar.']
+  ['Mais pedidos','Smash Bacon',27.90,'Pão brioche, blend bovino 100g, cheddar, bacon crocante, cebola caramelizada e molho da casa.'],
+  ['Mais pedidos','Duplo Cheddar',32.90,'Pão brioche, 2 blends bovinos de 100g, cheddar em dobro, picles e molho especial.'],
+  ['Mais pedidos','Burger da Casa',34.90,'Pão brioche, blend 160g, queijo, bacon, cebola caramelizada, alface, tomate e molho da casa.'],
+  ['Mais pedidos','Combo Smash',39.90,'Smash cheddar + batata frita individual + refrigerante lata.'],
+  ['Mais pedidos','Batata Cheddar e Bacon',24.90,'Batata frita crocante com creme de cheddar e bacon em cubos.'],
+
+  ['Smash Burgers','Smash Simples',21.90,'Pão brioche, blend bovino 100g, queijo cheddar, cebola e molho da casa.'],
+  ['Smash Burgers','Smash Salada',23.90,'Pão brioche, blend bovino 100g, cheddar, alface, tomate, cebola roxa e molho da casa.'],
+  ['Smash Burgers','Smash Bacon',27.90,'Pão brioche, blend bovino 100g, cheddar, bacon crocante, cebola caramelizada e molho da casa.'],
+  ['Smash Burgers','Smash Duplo',29.90,'Pão brioche, 2 blends bovinos de 100g, cheddar, picles e molho da casa.'],
+  ['Smash Burgers','Smash Triplo',37.90,'Pão brioche, 3 blends bovinos de 100g, cheddar em camadas, cebola e molho especial.'],
+
+  ['Burgers Artesanais','Burger Clássico',28.90,'Pão brioche, blend artesanal 160g, queijo prato, alface, tomate, cebola e maionese da casa.'],
+  ['Burgers Artesanais','Burger Bacon',33.90,'Pão brioche, blend artesanal 160g, cheddar, bacon, cebola caramelizada e barbecue.'],
+  ['Burgers Artesanais','Burger Gorgonzola',35.90,'Pão brioche, blend 160g, creme de gorgonzola, cebola crispy e rúcula.'],
+  ['Burgers Artesanais','Burger Costela',38.90,'Pão brioche, blend 160g, costela desfiada, cheddar, sour cream e cebola roxa.'],
+  ['Burgers Artesanais','Burger Picante',34.90,'Pão brioche, blend 160g, cheddar, bacon, jalapeño, cebola e molho picante.'],
+  ['Burgers Artesanais','Burger Frango Crocante',29.90,'Pão brioche, filé de frango empanado, queijo, alface, tomate e maionese temperada.'],
+  ['Burgers Artesanais','Burger Vegetariano',29.90,'Pão brioche, burger vegetal, queijo, alface, tomate, cebola roxa e molho especial.'],
+
+  ['Combos','Combo Smash',39.90,'Smash cheddar + batata frita individual + refrigerante lata.'],
+  ['Combos','Combo Bacon',45.90,'Smash bacon + batata frita individual + refrigerante lata.'],
+  ['Combos','Combo Artesanal',49.90,'Burger da Casa + batata frita individual + refrigerante lata.'],
+  ['Combos','Combo Duplo',79.90,'2 Smash Bacon + 2 batatas fritas individuais + refrigerante 1L.'],
+  ['Combos','Combo Família',109.90,'4 Smash Simples + batata grande + nuggets + refrigerante 1,5L.'],
+
+  ['Batatas e Porções','Batata Frita Individual',14.90,'Batata frita crocante e sequinha.'],
+  ['Batatas e Porções','Batata Frita Grande',24.90,'Porção grande de batata frita para compartilhar.'],
+  ['Batatas e Porções','Batata Cheddar e Bacon',24.90,'Batata frita com creme de cheddar e bacon em cubos.'],
+  ['Batatas e Porções','Batata com Costela',29.90,'Batata frita com costela desfiada, cheddar e sour cream.'],
+  ['Batatas e Porções','Onion Rings',19.90,'Porção com anéis de cebola empanados e crocantes.'],
+  ['Batatas e Porções','Nuggets',18.90,'Porção de nuggets crocantes com molho da casa.'],
+
+  ['Molhos e Extras','Molho da Casa',3.50,'Porção individual do molho especial da hamburgueria.'],
+  ['Molhos e Extras','Barbecue',3.50,'Porção individual de molho barbecue.'],
+  ['Molhos e Extras','Cheddar Cremoso',5.90,'Porção extra de cheddar cremoso.'],
+  ['Molhos e Extras','Bacon Extra',6.90,'Porção extra de bacon crocante.'],
+
+  ['Bebidas','Coca-Cola lata',7.90,'Lata 350 ml.'],
+  ['Bebidas','Coca-Cola Zero lata',7.90,'Lata 350 ml.'],
+  ['Bebidas','Guaraná lata',7.90,'Lata 350 ml.'],
+  ['Bebidas','Refrigerante 1L',12.90,'Consulte os sabores disponíveis.'],
+  ['Bebidas','Água mineral',5.00,'Água sem gás.'],
+  ['Bebidas','Água com gás',6.00,'Água mineral com gás.'],
+
+  ['Sobremesas','Brownie',12.90,'Brownie de chocolate com casquinha crocante e interior macio.'],
+  ['Sobremesas','Pudim',11.90,'Pudim cremoso de leite condensado.'],
+  ['Sobremesas','Milk-shake Chocolate',18.90,'Milk-shake cremoso de chocolate, 400 ml.'],
+  ['Sobremesas','Milk-shake Morango',18.90,'Milk-shake cremoso de morango, 400 ml.']
 ].map((p, i) => ({ id: i + 1, category: p[0], name: p[1], price: p[2], description: p[3] }));
 
 const money = (n) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(n);
@@ -308,7 +240,7 @@ export default function Home() {
               {activeOrder.status === 'PRONTO' && 'Seu pedido está pronto'}
             </h1>
             <p className="status-subtitle">
-              {activeOrder.status === 'NOVO' && 'Recebemos seu pedido. A equipe já consegue vê-lo no painel da padaria.'}
+              {activeOrder.status === 'NOVO' && 'Recebemos seu pedido. A equipe já consegue vê-lo no painel da hamburgueria.'}
               {activeOrder.status === 'PREPARANDO' && 'A equipe começou a preparar seus itens.'}
               {activeOrder.status === 'PRONTO' && 'Tudo certo. Seu pedido foi finalizado pela equipe.'}
             </p>
@@ -336,8 +268,8 @@ export default function Home() {
 
           <aside className="whatsapp-optin">
             <span className="optin-kicker">WHATSAPP</span>
-            <h2>Quer receber novidades da padaria?</h2>
-            <p>Combos de Natal, Dia das Mães, promoções especiais e encomendas direto pelo WhatsApp.</p>
+            <h2>Quer receber novidades da hamburgueria?</h2>
+            <p>Novos burgers, combos especiais, cupons e promoções direto pelo WhatsApp.</p>
 
             {!marketingSaved ? (
               <div className="optin-form">
@@ -381,8 +313,8 @@ export default function Home() {
       <header className="hero">
         <div className="hero-inner">
           <div className="eyebrow">CARDÁPIO DIGITAL</div>
-          <h1>Padaria da Vila</h1>
-          <p>Peça direto da mesa. Seu pedido vai para o balcão sem precisar chamar o atendimento.</p>
+          <h1>Brasa Burger</h1>
+          <p>Escolha seu burger, personalize o pedido e envie direto para a cozinha.</p>
           <div className="meta-row">
             <span>Mesa <strong>{mesa}</strong></span>
             <span>Aberto agora</span>
@@ -395,7 +327,7 @@ export default function Home() {
         <div className="toolbar">
           <label className="search">
             <span>Buscar</span>
-            <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Café, coxinha, bolo..." />
+            <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Smash, bacon, batata, combo..." />
           </label>
           <div className="categories" aria-label="Categorias">
             {categories.map((c) => <button key={c} className={category === c ? 'active' : ''} onClick={() => setCategory(c)}>{c}</button>)}
@@ -443,7 +375,7 @@ export default function Home() {
       </section>
 
       <footer>
-        <div>Padaria da Vila</div>
+        <div>Brasa Burger</div>
         <span>Cardápio demonstrativo • preços sujeitos a atualização</span>
       </footer>
 
@@ -476,7 +408,7 @@ export default function Home() {
                 <textarea
                   value={detailNote}
                   onChange={(e) => setDetailNote(e.target.value)}
-                  placeholder="Ex.: sem cebola, bem passado, sem açúcar..."
+                  placeholder="Ex.: sem cebola, sem picles, molho à parte..."
                 />
               </label>
 
@@ -512,7 +444,7 @@ export default function Home() {
                 </div>
               ))}
             </div>
-            <label className="notes">Observações do pedido<textarea value={orderNote} onChange={(e) => setOrderNote(e.target.value)} placeholder="Ex.: café sem açúcar, cortar sanduíche ao meio..." /></label>
+            <label className="notes">Observações do pedido<textarea value={orderNote} onChange={(e) => setOrderNote(e.target.value)} placeholder="Ex.: molhos separados, ponto da carne, observações gerais..." /></label>
             <div className="total"><span>Total</span><strong>{money(total)}</strong></div>
             <button className="send" onClick={sendOrder}>Enviar pedido</button>
             <p className="demo-note">Versão de teste: a mesa é gerada aleatoriamente entre 0 e 35.</p>
