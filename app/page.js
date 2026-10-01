@@ -254,8 +254,6 @@ export default function Home() {
 
   const sendOrder = async () => {
     if (!cartItems.length || sendingOrder) return;
-    const confirmed = window.confirm('Confirmar pedido de ' + money(total) + '?');
-    if (!confirmed) return;
     setSendingOrder(true);
 
     const table = qrFromUrl !== '' && Number.isFinite(Number(qrFromUrl))
@@ -601,7 +599,7 @@ export default function Home() {
             </div>
             <label className="notes">Observações do pedido<textarea value={orderNote} onChange={(e) => setOrderNote(e.target.value)} placeholder="Ex.: molhos separados, ponto da carne, observações gerais..." /></label>
             <div className="total"><span>Total</span><strong>{money(total)}</strong></div>
-            <button className="send" onClick={sendOrder} disabled={sendingOrder}>{sendingOrder ? 'Enviando pedido...' : 'Revisar e enviar pedido'}</button>
+            <button className="send" onClick={sendOrder} disabled={sendingOrder}>{sendingOrder ? 'Enviando pedido...' : 'Enviar pedido para a cozinha'}</button>
             <p className="demo-note">Versão de teste: a mesa é gerada aleatoriamente entre 0 e 35.</p>
           </aside>
         </div>
