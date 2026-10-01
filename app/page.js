@@ -136,6 +136,11 @@ export default function Home() {
   const mesa = activeOrder?.table ?? (qrFromUrl || '—');
 
   useEffect(() => {
+    const savedWhatsapp = localStorage.getItem('cardapio_last_whatsapp');
+    if (savedWhatsapp) setWhatsapp(savedWhatsapp);
+  }, []);
+
+  useEffect(() => {
     let cancelled = false;
 
     const loadProducts = async () => {
@@ -283,6 +288,7 @@ export default function Home() {
     };
 
     localStorage.setItem('padaria_qr_marketing_leads_v1', JSON.stringify([lead, ...leads]));
+    localStorage.setItem('cardapio_last_whatsapp', whatsapp);
     setMarketingSaved(true);
   };
 
@@ -345,6 +351,9 @@ export default function Home() {
             {!marketingSaved ? (
               <div className="optin-form">
                 <input
+                  type="tel"
+                  name="tel"
+                  autoComplete="tel"
                   value={whatsapp}
                   onChange={(e) => setWhatsapp(e.target.value)}
                   placeholder="(22) 99999-9999"
