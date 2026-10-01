@@ -462,15 +462,17 @@ export default function Home() {
           {visible.map((p) => {
             const qty = cart[p.id] || 0;
             return (
-              <article className="card product-card-clickable" key={p.id} onClick={() => openProduct(p)} tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') openProduct(p); }}>
-                <div className="product-mark"><img src={p.image} alt={p.name} loading="lazy" /></div>
+              <article className={'card product-card-clickable ' + (!p.available ? 'product-unavailable' : '')} key={p.id} onClick={() => openProduct(p)} tabIndex={p.available ? 0 : -1} aria-disabled={!p.available} onKeyDown={(e) => { if (p.available && (e.key === 'Enter' || e.key === ' ')) openProduct(p); }}>
+                <div className="product-mark"><img src={p.image} alt={p.name} loading="lazy" />{!p.available && <span className="unavailable-badge">Indisponível</span>}</div>
                 <div className="card-body">
                   <div className="category-label">{p.category}</div>
                   <h3>{p.name}</h3>
                   <p>{p.description}</p>
                   <div className="card-footer">
                     <strong>{money(p.price)}</strong>
-                    {qty === 0 ? (
+                    {!p.available ? (
+                      <button className="add-btn" disabled>Indisponível</button>
+                    ) : qty === 0 ? (
                       <button className="add-btn" onClick={(e) => { e.stopPropagation(); openProduct(p); }}>Ver detalhes</button>
                     ) : (
                       <div className="stepper">
@@ -501,6 +503,7 @@ export default function Home() {
       )}
 
       {sentMessage && <div className="order-success">{sentMessage}</div>}
+      {addedMessage && <div className="cart-added-toast">{addedMessage}</div>}
 
       {selectedProduct && (
         <div className="product-detail-overlay" onMouseDown={(e) => { if (e.target === e.currentTarget) setSelectedProduct(null); }}>
@@ -516,6 +519,35 @@ export default function Home() {
               <h2>{selectedProduct.name}</h2>
               <p>{selectedProduct.description}</p>
               <strong className="product-detail-price">{money(selectedProduct.price)}</strong>
+
+              {(selectedProduct.meatPoints || []).length > 0 && (
+                <div className="product-option-group">
+                  <div className="product-option-title">Ponto da carne</div>
+                  <div className="product-option-list">
+                    {selectedProduct.meatPoints.map((point) => (
+                      <label className="product-option-row" key={point}>
+                        <input type="radio" name="meat-point" checked={detailMeatPoint === point} onChange={() => setDetailMeatPoint(point)} />
+                        <span>{point}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {(selectedProduct.extras || []).length > 0 && (
+                <div className="product-option-group">
+                  <div className="product-option-title">Adicionais</div>
+                  <div className="product-option-list">
+                    {selectedProduct.extras.map((extra) => (
+                      <label className="product-option-row" key={extra.id}>
+                        <input type="checkbox" checked={detailExtras.includes(extra.id)} onChange={() => setDetailExtras((current) => current.includes(extra.id) ? current.filter((id) => id !== extra.id) : [...current, extra.id])} />
+                        <span>{extra.nome}</span>
+                        <strong>+ {money(Number(extra.preco || 0))}</strong>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               <label className="product-detail-note">
                 Observação deste item
@@ -533,7 +565,7 @@ export default function Home() {
                   <button onClick={() => setDetailQty((q) => q + 1)}>+</button>
                 </div>
                 <button className="product-detail-add" onClick={addFromDetail}>
-                  {cart[selectedProduct.id] ? 'Atualizar item' : 'Adicionar'} · {money(selectedProduct.price * detailQty)}
+                  {cart[selectedProduct.id] ? 'Atualizar item' : 'Adicionar'} · {money((selectedProduct.price + detailExtrasTotal) * detailQty)}
                 </button>
               </div>
             </div>
@@ -546,12 +578,21 @@ export default function Home() {
           <aside className="cart-panel" role="dialog" aria-modal="true" aria-label="Seu pedido">
             <div className="cart-head">
               <div><span className="eyebrow">MESA {mesa}</span><h2>Seu pedido</h2></div>
-              <button className="close" onClick={() => setCartOpen(false)}>Fechar</button>
+              <button className="close" onClick={() => setCartOpen(false)}>Voltar ao cardápio</button>
             </div>
+            <button className="continue-shopping" onClick={() => setCartOpen(false)}>← Continuar escolhendo itens</button>
             <div className="cart-list">
               {cartItems.map((p) => (
                 <div className="cart-item" key={p.id}>
-                  <div><strong>{p.name}</strong><span>{money(p.price)} cada</span>{p.itemNote && <small className="cart-item-note">Obs.: {p.itemNote}</small>}</div>
+                  <img className="cart-item-image" src={p.image} alt="" />
+                  <div className="cart-item-info">
+                    <strong>{p.name}</strong>
+                    <span>{money(p.unitTotal)} cada · subtotal {money(p.subtotal)}</span>
+                    {p.meatPoint && <small>Ponto: {p.meatPoint}</small>}
+                    {p.extras.length > 0 && <small>Adicionais: {p.extras.map((extra) => extra.nome).join(', ')}</small>}
+                    <label className="cart-inline-note">Observação<input value={p.itemNote} onChange={(e) => setItemNotes((current) => ({ ...current, [p.id]: e.target.value }))} placeholder="Ex.: sem cebola" /></label>
+                    <button className="cart-edit-item" onClick={() => openProduct(p)}>Editar opções</button>
+                  </div>
                   <div className="stepper">
                     <button onClick={() => remove(p.id)}>−</button><span>{p.qty}</span><button onClick={() => add(p.id)}>+</button>
                   </div>
@@ -560,7 +601,7 @@ export default function Home() {
             </div>
             <label className="notes">Observações do pedido<textarea value={orderNote} onChange={(e) => setOrderNote(e.target.value)} placeholder="Ex.: molhos separados, ponto da carne, observações gerais..." /></label>
             <div className="total"><span>Total</span><strong>{money(total)}</strong></div>
-            <button className="send" onClick={sendOrder}>Enviar pedido</button>
+            <button className="send" onClick={sendOrder} disabled={sendingOrder}>{sendingOrder ? 'Enviando pedido...' : 'Revisar e enviar pedido'}</button>
             <p className="demo-note">Versão de teste: a mesa é gerada aleatoriamente entre 0 e 35.</p>
           </aside>
         </div>
