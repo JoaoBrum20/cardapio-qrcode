@@ -110,6 +110,9 @@ const fallbackProducts = fallbackProductRows.map((p, i) => ({
   price: p[2],
   description: p[3],
   image: productImages[p[1]] || '/images/smash-bacon.jpg',
+  available: true,
+  extras: [],
+  meatPoints: [],
 }));
 
 const money = (n) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(n);
@@ -129,7 +132,12 @@ export default function Home() {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [detailQty, setDetailQty] = useState(1);
   const [detailNote, setDetailNote] = useState('');
+  const [detailExtras, setDetailExtras] = useState([]);
+  const [detailMeatPoint, setDetailMeatPoint] = useState('');
   const [itemNotes, setItemNotes] = useState({});
+  const [itemOptions, setItemOptions] = useState({});
+  const [addedMessage, setAddedMessage] = useState('');
+  const [sendingOrder, setSendingOrder] = useState(false);
 
   const params = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
   const qrFromUrl = params?.get('qr') || params?.get('mesa') || '';
@@ -202,16 +210,27 @@ export default function Home() {
   const add = (id) => setCart((c) => ({ ...c, [id]: (c[id] || 0) + 1 }));
 
   const openProduct = (product) => {
+    if (!product.available) return;
+    const savedOptions = itemOptions[product.id] || {};
     setSelectedProduct(product);
     setDetailQty(Math.max(1, cart[product.id] || 1));
     setDetailNote(itemNotes[product.id] || '');
+    setDetailExtras(Array.isArray(savedOptions.extras) ? savedOptions.extras.map((extra) => extra.id) : []);
+    setDetailMeatPoint(savedOptions.meatPoint || '');
   };
 
   const addFromDetail = () => {
-    if (!selectedProduct) return;
+    if (!selectedProduct || !selectedProduct.available) return;
+    const selectedExtras = (selectedProduct.extras || []).filter((extra) => detailExtras.includes(extra.id));
     setCart((current) => ({ ...current, [selectedProduct.id]: detailQty }));
     setItemNotes((current) => ({ ...current, [selectedProduct.id]: detailNote.trim() }));
+    setItemOptions((current) => ({
+      ...current,
+      [selectedProduct.id]: { extras: selectedExtras, meatPoint: detailMeatPoint },
+    }));
     setSelectedProduct(null);
+    setAddedMessage(selectedProduct.name + ' adicionado ao carrinho');
+    window.setTimeout(() => setAddedMessage(''), 2200);
   };
   const remove = (id) => setCart((c) => {
     const next = { ...c };
@@ -221,12 +240,23 @@ export default function Home() {
 
   const cartItems = products
     .filter((p) => cart[p.id])
-    .map((p) => ({ ...p, qty: cart[p.id], itemNote: itemNotes[p.id] || '' }));
+    .map((p) => {
+      const options = itemOptions[p.id] || {};
+      const extras = Array.isArray(options.extras) ? options.extras : [];
+      const extrasTotal = extras.reduce((sum, extra) => sum + Number(extra.preco || 0), 0);
+      const unitTotal = p.price + extrasTotal;
+      return { ...p, qty: cart[p.id], itemNote: itemNotes[p.id] || '', extras, meatPoint: options.meatPoint || '', unitTotal, subtotal: unitTotal * cart[p.id] };
+    });
   const totalQty = cartItems.reduce((s, p) => s + p.qty, 0);
-  const total = cartItems.reduce((s, p) => s + p.qty * p.price, 0);
+  const total = cartItems.reduce((s, p) => s + p.subtotal, 0);
+  const selectedDetailExtras = selectedProduct ? (selectedProduct.extras || []).filter((extra) => detailExtras.includes(extra.id)) : [];
+  const detailExtrasTotal = selectedDetailExtras.reduce((sum, extra) => sum + Number(extra.preco || 0), 0);
 
   const sendOrder = async () => {
-    if (!cartItems.length) return;
+    if (!cartItems.length || sendingOrder) return;
+    const confirmed = window.confirm('Confirmar pedido de ' + money(total) + '?');
+    if (!confirmed) return;
+    setSendingOrder(true);
 
     const table = qrFromUrl !== '' && Number.isFinite(Number(qrFromUrl))
       ? Math.max(0, Math.min(35, Number(qrFromUrl)))
@@ -235,7 +265,7 @@ export default function Home() {
     try {
       const created = await criarPedido({
         qrNumero: table,
-        itens: cartItems.map((p) => ({ name: p.name, qty: p.qty, note: p.itemNote || '' })),
+        itens: cartItems.map((p) => ({ product_id: p.id, name: p.name, category: p.category, qty: p.qty, unit_price: p.price, extras: p.extras, meat_point: p.meatPoint || null, note: p.itemNote || '', unit_total: p.unitTotal, subtotal: p.subtotal })),
         observacao: orderNote.trim(),
         total,
       });
@@ -245,7 +275,7 @@ export default function Home() {
         token: created.pedido_token,
         table: created.qr_numero,
         status: created.pronto ? 'PRONTO' : created.preparando ? 'PREPARANDO' : 'NOVO',
-        items: cartItems.map((p) => ({ name: p.name, qty: p.qty, note: p.itemNote || '' })),
+        items: cartItems.map((p) => ({ product_id: p.id, name: p.name, category: p.category, qty: p.qty, unit_price: p.price, extras: p.extras, meat_point: p.meatPoint || null, note: p.itemNote || '', unit_total: p.unitTotal, subtotal: p.subtotal })),
         note: orderNote.trim(),
         total,
         createdAt: created.criado_em,
@@ -257,6 +287,8 @@ export default function Home() {
       setActiveOrder(order);
       setShowTracking(true);
       setCart({});
+      setItemNotes({});
+      setItemOptions({});
       setOrderNote('');
       setCartOpen(false);
       setSentMessage(`Pedido enviado para a Mesa ${table}`);
@@ -265,6 +297,8 @@ export default function Home() {
       console.error('Erro ao enviar pedido:', error);
       setSentMessage('Não foi possível enviar o pedido. Tente novamente.');
       setTimeout(() => setSentMessage(''), 4000);
+    } finally {
+      setSendingOrder(false);
     }
   };
 
