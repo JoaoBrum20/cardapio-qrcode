@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import TestNav from '../components/TestNav';
+import { buscarStatusPedido, criarPedido } from '../lib/padariaSupabase';
 
 const categories = [
   'Todos', 'Cafés', 'Pães e Torradas', 'Lanches', 'Salgados', 'Pães de Queijo',
@@ -146,28 +147,36 @@ export default function Home() {
   const mesa = activeOrder?.table ?? (qrFromUrl || '—');
 
   useEffect(() => {
-    const syncActiveOrder = () => {
-      const orderId = sessionStorage.getItem('padaria_active_order_id');
-      if (!orderId) return;
+    let cancelled = false;
+
+    const syncActiveOrder = async () => {
+      const token = sessionStorage.getItem('padaria_active_order_token');
+      if (!token) return;
 
       try {
-        const orders = JSON.parse(localStorage.getItem('padaria_qr_orders_v1') || '[]');
-        const current = Array.isArray(orders)
-          ? orders.find((order) => String(order.id) === String(orderId))
-          : null;
+        const current = await buscarStatusPedido(token);
+        if (!current || cancelled) return;
 
-        if (current) setActiveOrder(current);
-      } catch {}
+        setActiveOrder({
+          id: current.id,
+          token: current.pedido_token,
+          table: current.qr_numero,
+          status: current.pronto ? 'PRONTO' : current.preparando ? 'PREPARANDO' : 'NOVO',
+          items: Array.isArray(current.itens) ? current.itens : [],
+          note: current.observacao || '',
+          total: Number(current.total || 0),
+          createdAt: current.criado_em,
+        });
+      } catch (error) {
+        console.error('Erro ao acompanhar pedido:', error);
+      }
     };
 
     syncActiveOrder();
-    window.addEventListener('storage', syncActiveOrder);
-    window.addEventListener('padaria-orders-updated', syncActiveOrder);
     const interval = window.setInterval(syncActiveOrder, 1200);
 
     return () => {
-      window.removeEventListener('storage', syncActiveOrder);
-      window.removeEventListener('padaria-orders-updated', syncActiveOrder);
+      cancelled = true;
       window.clearInterval(interval);
     };
   }, []);
@@ -188,42 +197,46 @@ export default function Home() {
   const totalQty = cartItems.reduce((s, p) => s + p.qty, 0);
   const total = cartItems.reduce((s, p) => s + p.qty * p.price, 0);
 
-  const sendOrder = () => {
+  const sendOrder = async () => {
     if (!cartItems.length) return;
 
     const table = qrFromUrl !== '' && Number.isFinite(Number(qrFromUrl))
       ? Math.max(0, Math.min(35, Number(qrFromUrl)))
       : Math.floor(Math.random() * 36);
-    const order = {
-      id: Date.now(),
-      table,
-      status: 'NOVO',
-      items: cartItems.map((p) => ({ name: p.name, qty: p.qty })),
-      note: orderNote.trim(),
-      createdAt: new Date().toISOString(),
-      persisted: true,
-    };
 
-    const key = 'padaria_qr_orders_v1';
-    let current = [];
     try {
-      current = JSON.parse(localStorage.getItem(key) || '[]');
-      if (!Array.isArray(current)) current = [];
-    } catch {
-      current = [];
+      const created = await criarPedido({
+        qrNumero: table,
+        itens: cartItems.map((p) => ({ name: p.name, qty: p.qty })),
+        observacao: orderNote.trim(),
+        total,
+      });
+
+      const order = {
+        id: created.id,
+        token: created.pedido_token,
+        table: created.qr_numero,
+        status: created.pronto ? 'PRONTO' : created.preparando ? 'PREPARANDO' : 'NOVO',
+        items: cartItems.map((p) => ({ name: p.name, qty: p.qty })),
+        note: orderNote.trim(),
+        total,
+        createdAt: created.criado_em,
+      };
+
+      sessionStorage.setItem('padaria_active_order_token', String(created.pedido_token));
+      sessionStorage.setItem('padaria_active_qr', String(table));
+
+      setActiveOrder(order);
+      setCart({});
+      setOrderNote('');
+      setCartOpen(false);
+      setSentMessage(`Pedido enviado para a Mesa ${table}`);
+      setTimeout(() => setSentMessage(''), 3500);
+    } catch (error) {
+      console.error('Erro ao enviar pedido:', error);
+      setSentMessage('Não foi possível enviar o pedido. Tente novamente.');
+      setTimeout(() => setSentMessage(''), 4000);
     }
-
-    localStorage.setItem(key, JSON.stringify([order, ...current]));
-    sessionStorage.setItem('padaria_active_order_id', String(order.id));
-    sessionStorage.setItem('padaria_active_qr', String(table));
-    window.dispatchEvent(new Event('padaria-orders-updated'));
-
-    setActiveOrder(order);
-    setCart({});
-    setOrderNote('');
-    setCartOpen(false);
-    setSentMessage(`Pedido enviado para a Mesa ${table}`);
-    setTimeout(() => setSentMessage(''), 3500);
   };
 
   const saveMarketingLead = () => {
@@ -250,7 +263,7 @@ export default function Home() {
   };
 
   const startNewOrder = () => {
-    sessionStorage.removeItem('padaria_active_order_id');
+    sessionStorage.removeItem('padaria_active_order_token');
     sessionStorage.removeItem('padaria_active_qr');
     setActiveOrder(null);
     setMarketingSaved(false);
