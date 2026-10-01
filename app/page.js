@@ -59,7 +59,7 @@ const products = [
   ['Sobremesas','Pudim',11.90,'Pudim cremoso de leite condensado.'],
   ['Sobremesas','Milk-shake Chocolate',18.90,'Milk-shake cremoso de chocolate, 400 ml.'],
   ['Sobremesas','Milk-shake Morango',18.90,'Milk-shake cremoso de morango, 400 ml.']
-].map((p, i) => ({ id: i + 1, category: p[0], name: p[1], price: p[2], description: p[3] }));
+].map((p, i) => ({ id: i + 1, category: p[0], name: p[1], price: p[2], description: p[3], image: '/images/smash-bacon.webp' }));
 
 const money = (n) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(n);
 
@@ -349,7 +349,7 @@ export default function Home() {
             const qty = cart[p.id] || 0;
             return (
               <article className="card product-card-clickable" key={p.id} onClick={() => openProduct(p)} tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') openProduct(p); }}>
-                <div className="product-mark" aria-hidden="true"><span>{p.name.slice(0,1)}</span></div>
+                <div className="product-mark"><img src={p.image} alt={p.name} loading="lazy" /></div>
                 <div className="card-body">
                   <div className="category-label">{p.category}</div>
                   <h3>{p.name}</h3>
@@ -393,8 +393,8 @@ export default function Home() {
           <section className="product-detail-modal" role="dialog" aria-modal="true" aria-label={selectedProduct.name}>
             <button className="product-detail-close" onClick={() => setSelectedProduct(null)} aria-label="Fechar">×</button>
 
-            <div className="product-detail-image" aria-hidden="true">
-              <span>{selectedProduct.name.slice(0,1)}</span>
+            <div className="product-detail-image">
+              <img src={selectedProduct.image} alt={selectedProduct.name} />
             </div>
 
             <div className="product-detail-content">
