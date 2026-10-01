@@ -171,7 +171,7 @@ export default function Home() {
 
   const visible = useMemo(() => {
     const term = query.trim().toLowerCase();
-    return products.filter((p) => (category === 'Todos' || p.category === category) && (!term || p.name.toLowerCase().includes(term)));
+    return productsWithImages.filter((p) => (category === 'Todos' || p.category === category) && (!term || p.name.toLowerCase().includes(term)));
   }, [category, query]);
 
   const add = (id) => setCart((c) => ({ ...c, [id]: (c[id] || 0) + 1 }));
@@ -194,7 +194,7 @@ export default function Home() {
     return next;
   });
 
-  const cartItems = products
+  const cartItems = productsWithImages
     .filter((p) => cart[p.id])
     .map((p) => ({ ...p, qty: cart[p.id], itemNote: itemNotes[p.id] || '' }));
   const totalQty = cartItems.reduce((s, p) => s + p.qty, 0);
