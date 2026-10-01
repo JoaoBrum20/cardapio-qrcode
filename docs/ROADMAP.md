@@ -6,7 +6,7 @@
 - [x] Busca
 - [x] Carrinho
 - [x] Mesa/QR por query string
-- [ ] Fotos reais
+- [x] Fotos reais
 
 ## 2. Banco e pedidos
 - [x] Supabase conectado
@@ -23,10 +23,10 @@
 - [ ] Realtime sem polling
 
 ## 4. Administração
-- [ ] Produtos
-- [ ] Preços
-- [ ] Disponibilidade
-- [ ] Categorias
+- [x] Produtos no Supabase
+- [x] Preços vindos do banco
+- [x] Disponibilidade via campo `ativo`
+- [x] Categorias vindas do banco
 - [ ] Mesas e QR Codes
 
 ## 5. Inteligência
@@ -34,3 +34,14 @@
 - [ ] Vendas do dia
 - [ ] Produtos mais vendidos
 - [ ] Ticket médio
+
+
+## 6. Catálogo dinâmico
+- [x] Criar `CARDAPIO_QRCODE_PRODUTOS`
+- [x] Migrar os 42 produtos atuais para o Supabase
+- [x] Vincular caminhos das imagens aos produtos
+- [x] Ler produtos ativos pela Data API
+- [x] Ordenar cardápio pelo campo `ordem`
+- [x] Manter fallback local temporário
+- [ ] Criar tela administrativa para editar catálogo sem acessar o Supabase
+- [ ] Permitir upload/gestão de imagens pela administração
