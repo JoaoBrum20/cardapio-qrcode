@@ -141,6 +141,7 @@ export default function Home() {
   const [activeOrder, setActiveOrder] = useState(null);
   const [whatsapp, setWhatsapp] = useState('');
   const [marketingSaved, setMarketingSaved] = useState(false);
+  const [showTracking, setShowTracking] = useState(true);
 
   const params = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
   const qrFromUrl = params?.get('qr') || params?.get('mesa') || '';
@@ -167,6 +168,7 @@ export default function Home() {
           total: Number(current.total || 0),
           createdAt: current.criado_em,
         });
+        setShowTracking(true);
       } catch (error) {
         console.error('Erro ao acompanhar pedido:', error);
       }
@@ -227,6 +229,7 @@ export default function Home() {
       sessionStorage.setItem('padaria_active_qr', String(table));
 
       setActiveOrder(order);
+      setShowTracking(true);
       setCart({});
       setOrderNote('');
       setCartOpen(false);
@@ -262,15 +265,17 @@ export default function Home() {
     setMarketingSaved(true);
   };
 
-  const startNewOrder = () => {
-    sessionStorage.removeItem('padaria_active_order_token');
-    sessionStorage.removeItem('padaria_active_qr');
-    setActiveOrder(null);
-    setMarketingSaved(false);
-    setWhatsapp('');
+  const returnToMenu = () => {
+    setShowTracking(false);
+    setCart({});
+    setOrderNote('');
   };
 
-  if (activeOrder) {
+  const viewTracking = () => {
+    setShowTracking(true);
+  };
+
+  if (activeOrder && showTracking) {
     const statusIndex = activeOrder.status === 'NOVO' ? 0 : activeOrder.status === 'PREPARANDO' ? 1 : 2;
 
     return (
@@ -306,9 +311,9 @@ export default function Home() {
               {activeOrder.note && <p><strong>Obs.:</strong> {activeOrder.note}</p>}
             </div>
 
-            {activeOrder.status === 'PRONTO' && (
-              <button className="new-order-button" onClick={startNewOrder}>Fazer novo pedido</button>
-            )}
+            <div className="tracking-actions">
+              <button className="new-order-button" onClick={returnToMenu}>Voltar ao cardápio</button>
+            </div>
           </div>
 
           <aside className="whatsapp-optin">
@@ -340,6 +345,21 @@ export default function Home() {
   return (
     <main>
       <TestNav />
+
+      {activeOrder && (
+        <div className="active-order-banner">
+          <div>
+            <strong>
+              {activeOrder.status === 'NOVO' && 'Pedido enviado à cozinha'}
+              {activeOrder.status === 'PREPARANDO' && 'Pedido em preparo'}
+              {activeOrder.status === 'PRONTO' && 'Pedido pronto'}
+            </strong>
+            <span>QR / Mesa {activeOrder.table}</span>
+          </div>
+          <button onClick={viewTracking}>Acompanhar pedido</button>
+        </div>
+      )}
+
       <header className="hero">
         <div className="hero-inner">
           <div className="eyebrow">CARDÁPIO DIGITAL</div>
