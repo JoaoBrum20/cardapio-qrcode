@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import TestNav from '../../components/TestNav';
 
 const initialOrders = [
   {
@@ -69,6 +70,7 @@ export default function PedidosPage() {
 
   return (
     <main className="orders-page">
+      <TestNav />
       <header className="orders-header">
         <div>
           <span className="orders-kicker">PAINEL DA PADARIA</span>
