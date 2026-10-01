@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import TestNav from '../../components/TestNav';
+import styles from './Pedidos.module.css';
 
 const initialOrders = [
   {
@@ -164,44 +165,44 @@ export default function PedidosPage() {
   };
 
   return (
-    <main className="orders-page">
+    <main className={styles.page}>
       <TestNav />
 
-      <header className="orders-header">
+      <header className={styles.header}>
         <h1>Pedidos</h1>
-        <div className="orders-summary">
+        <div className={styles.summary}>
           <strong>{activeOrders.length}</strong>
           <span>ativos</span>
         </div>
       </header>
 
-      <section className="orders-strip" aria-label="Pedidos em ordem do mais novo para o mais antigo">
+      <section className={styles.strip} aria-label="Pedidos em ordem do mais novo para o mais antigo">
         {activeOrders.map((order) => (
-          <article className={`order-column ${order.status === 'PRONTO' ? 'is-ready' : ''}`} key={order.id}>
-            <div className="order-table-head">
+          <article className={`${styles.card} ${order.status === 'PRONTO' ? styles.ready : ''}`} key={order.id}>
+            <div className={styles.tableHead}>
               <h2>Mesa {order.table}</h2>
             </div>
 
-            <div className="order-card-content">
-              <div className="order-items">
+            <div className={styles.cardContent}>
+              <div className={styles.items}>
                 {order.items.map((item) => (
-                  <div className="order-item" key={item.name}>
-                    <strong className="item-qty">{item.qty}x</strong>
+                  <div className={styles.item} key={item.name}>
+                    <strong className={styles.qty}>{item.qty}x</strong>
                     <span>{item.name}</span>
                   </div>
                 ))}
               </div>
 
               {order.note && (
-                <div className="order-note">
+                <div className={styles.note}>
                   <span>ATENÇÃO</span>
                   <strong>{order.note}</strong>
                 </div>
               )}
 
-              <div className="order-footer">
+              <div className={styles.footer}>
                 <button
-                  className="ready-button"
+                  className={styles.readyButton}
                   disabled={order.status === 'PRONTO'}
                   onClick={() => markReady(order.id)}
                 >
@@ -214,7 +215,7 @@ export default function PedidosPage() {
       </section>
 
       {activeOrders.length === 0 && (
-        <div className="orders-empty">
+        <div className={styles.empty}>
           <h2>Nenhum pedido ativo</h2>
           <p>Os novos pedidos aparecerão aqui.</p>
         </div>
