@@ -4,20 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import TestNav from '../../components/TestNav';
 import styles from './Pedidos.module.css';
 
-const demoOrders = [
-  { id:184, table:12, status:'NOVO', items:[{name:'Café com leite',qty:2},{name:'Pão na chapa',qty:1},{name:'Coxinha de frango',qty:3}], note:'1 café sem açúcar' },
-  { id:185, table:7, status:'NOVO', items:[{name:'Cappuccino tradicional',qty:1},{name:'Pão de queijo grande',qty:2}], note:'Aquecer bem' },
-  { id:186, table:3, status:'PREPARANDO', items:[{name:'Misto quente',qty:2},{name:'Suco de laranja',qty:2}], note:'' },
-  { id:187, table:5, status:'NOVO', items:[{name:'Café expresso',qty:2},{name:'Pão de queijo grande',qty:1},{name:'Bolo de cenoura com chocolate',qty:1}], note:'Café sem açúcar' },
-  { id:188, table:9, status:'PREPARANDO', items:[{name:'Pão com ovo e queijo',qty:2},{name:'Suco de maracujá',qty:1}], note:'' },
-  { id:189, table:2, status:'NOVO', items:[{name:'Coxinha com catupiry',qty:4},{name:'Refrigerante lata',qty:2}], note:'2 refrigerantes sem gelo' },
-  { id:190, table:15, status:'NOVO', items:[{name:'Cappuccino tradicional',qty:2},{name:'Croissant de queijo',qty:2}], note:'' },
-  { id:191, table:4, status:'NOVO', items:[{name:'Tapioca de queijo',qty:1},{name:'Café coado',qty:1},{name:'Água mineral',qty:1}], note:'Tapioca bem passada' },
-  { id:192, table:11, status:'NOVO', items:[{name:'X-Burguer',qty:2},{name:'Batata frita',qty:1},{name:'Refrigerante 600 ml',qty:2}], note:'Sem cebola' },
-  { id:193, table:8, status:'NOVO', items:[{name:'Pudim',qty:2},{name:'Café com leite',qty:2}], note:'' },
-  { id:194, table:6, status:'NOVO', items:[{name:'Omelete com queijo',qty:1},{name:'Suco de laranja',qty:1}], note:'Sem sal' },
-  { id:195, table:10, status:'NOVO', items:[{name:'Misto quente',qty:3},{name:'Chocolate quente',qty:2}], note:'Cortar os mistos ao meio' },
-];
+
 
 const STORAGE_KEY = 'padaria_qr_orders_v1';
 
@@ -31,16 +18,13 @@ const readStoredOrders = () => {
 };
 
 export default function PedidosPage() {
-  const [orders, setOrders] = useState(demoOrders);
+  const [orders, setOrders] = useState([]);
   const [selected, setSelected] = useState(null);
 
   useEffect(() => {
     const syncOrders = () => {
       const stored = readStoredOrders();
-      setOrders([
-        ...stored,
-        ...demoOrders.filter((demo) => !stored.some((order) => order.id === demo.id)),
-      ]);
+      setOrders(stored);
     };
 
     syncOrders();
