@@ -168,7 +168,6 @@ export default function Home() {
           total: Number(current.total || 0),
           createdAt: current.criado_em,
         });
-        setShowTracking(true);
       } catch (error) {
         console.error('Erro ao acompanhar pedido:', error);
       }
