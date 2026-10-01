@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import TestNav from '../components/TestNav';
 
 const categories = [
   'Todos', 'Cafés', 'Pães e Torradas', 'Lanches', 'Salgados', 'Pães de Queijo',
@@ -155,6 +156,7 @@ export default function Home() {
 
   return (
     <main>
+      <TestNav />
       <header className="hero">
         <div className="hero-inner">
           <div className="eyebrow">CARDÁPIO DIGITAL</div>
