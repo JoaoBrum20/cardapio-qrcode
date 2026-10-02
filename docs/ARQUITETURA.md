@@ -86,7 +86,7 @@ As imagens permanecem em `public/images/` no projeto e o banco armazena o caminh
 Com isso, preço, descrição, categoria, ordem, disponibilidade e associação de imagem podem ser alterados no banco sem novo deploy, desde que a imagem já exista no projeto.
 
 
-## Atualização — 02/10/2026: clientes e inteligência
+## Atualização — 02/10/2026: clientes e base de métricas
 
 Foi adicionada a base de clientes do Cardápio QR Code, separando cadastro do cliente do histórico de pedidos.
 
@@ -124,7 +124,7 @@ Fluxo:
 
 A função `cardapio_qrcode_criar_pedido` também passou a aceitar `p_cliente_id`.
 
-### Inteligência de clientes
+### Base consolidada de métricas por cliente
 
 Foi criada a view:
 - `VW_CARDAPIO_QRCODE_CLIENTES_INTELIGENCIA`
@@ -144,7 +144,9 @@ Ela consolida, por cliente:
 - categorias preferidas;
 - costumes de compra em JSON.
 
-A regra permanece normalizada: pedidos continuam em `CARDAPIO_QRCODE_PEDIDOS`; a view deriva a inteligência sem duplicar o histórico.
+A regra permanece normalizada: pedidos continuam em `CARDAPIO_QRCODE_PEDIDOS`; a view consolida métricas e campos de apoio sem duplicar o histórico.
+
+**Importante:** a inteligência individual avançada por cliente ainda não está implementada no dashboard. Perfil 360º, padrões/combinações de compra, análise de adicionais e sugestões por clientes semelhantes continuam como próxima etapa.
 
 ## Dashboard administrativo de clientes
 
@@ -180,7 +182,7 @@ Essa chave privada nunca deve receber prefixo `NEXT_PUBLIC_` e nunca deve ser en
 
 A tabela de clientes e a view de inteligência não possuem leitura pública direta para `anon`.
 
-### Próxima tela planejada: perfil 360º do cliente
+### Próxima etapa planejada: inteligência individual e perfil 360º do cliente
 
 Ao clicar em um cliente da lista, será criada a rota:
 - `/dashboard/clientes/[cliente_id]`
