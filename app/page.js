@@ -356,7 +356,7 @@ export default function Home() {
             <div className="review-offer">
               <span>GOSTOU?</span>
               <h2>Que tal nos avaliar no Google?</h2>
-              <p>Avalie a hamburgueria e ganhe um Sonho.</p>
+              <p>Avalie nossa hamburgueria e ganhe 1 porção de batata.</p>
             </div>
 
             {GOOGLE_REVIEW_URL ? (
