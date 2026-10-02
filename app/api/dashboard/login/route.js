@@ -3,7 +3,7 @@ import {
   dashboardAuthConfigured,
   dashboardSessionToken,
   verifyDashboardPassword,
-} from '@/lib/dashboardAuth';
+} from '../../../../lib/dashboardAuth';
 
 export async function POST(request) {
   if (!dashboardAuthConfigured()) {
