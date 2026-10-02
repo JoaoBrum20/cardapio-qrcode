@@ -88,3 +88,38 @@
 - [x] Proteger APIs de clientes com sessão HttpOnly
 - [ ] Configurar `DASHBOARD_PASSWORD` em Production na Vercel
 - [ ] Evoluir o login simples para autenticação multiusuário quando necessário
+
+
+## 10. Persistência do pedido
+- [x] Salvar carrinho em `sessionStorage`
+- [x] Salvar observações por item
+- [x] Salvar adicionais e ponto da carne
+- [x] Salvar observação geral do pedido
+- [x] Restaurar o pedido ao recarregar a página
+- [x] Preservar pedido ao voltar do checkout/acompanhamento
+- [x] Limpar o rascunho somente após envio confirmado
+- [ ] Avaliar persistência em `localStorage` no futuro caso seja necessário manter o carrinho entre abas/sessões
+
+## 11. Inteligência individual de cliente
+- [x] Perfil 360º
+- [x] Histórico de pedidos
+- [x] Ranking de produtos
+- [x] Combinações frequentes
+- [x] Adicionais e preferências
+- [x] Hábitos por dia/horário
+- [x] Frequência média
+- [x] Similaridade Jaccard
+- [x] Sugestões por clientes semelhantes
+- [x] Linha da lista clicável
+- [x] Página `/dashboard/clientes/[clienteId]`
+- [ ] Risco de abandono
+- [ ] Produto que parou de pedir
+- [ ] Evoluir recomendações conforme a base crescer
+
+## 12. Segurança administrativa
+- [x] Criar `/dashboard/login`
+- [x] Criar `DASHBOARD_PASSWORD`
+- [x] Criar sessão HttpOnly/Secure/SameSite
+- [x] Proteger APIs de clientes
+- [x] Manter `SUPABASE_SECRET_KEY` somente no servidor
+- [ ] Evoluir para autenticação multiusuário quando necessário
