@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import styles from './Clientes.module.css';
 
 const PAGE_SIZE_OPTIONS = [25, 50, 100];
@@ -70,6 +71,7 @@ function sourceLabel(value) {
 }
 
 export default function ClientesDashboardPage() {
+  const router = useRouter();
   const [query, setQuery] = useState('');
   const [inactivity, setInactivity] = useState(0);
   const [order, setOrder] = useState('pedidos30-desc');
@@ -119,6 +121,11 @@ export default function ClientesDashboardPage() {
 
       const payload = await response.json();
 
+      if (response.status === 401) {
+        router.replace('/dashboard/login');
+        return;
+      }
+
       if (!response.ok) {
         throw new Error(payload?.error || 'Não foi possível carregar os clientes.');
       }
@@ -131,7 +138,7 @@ export default function ClientesDashboardPage() {
     } finally {
       setLoading(false);
     }
-  }, [page, applied]);
+  }, [page, applied, router]);
 
   useEffect(() => {
     load();
@@ -316,7 +323,19 @@ export default function ClientesDashboardPage() {
                 {items.map((item) => {
                   const tone = inactivityTone(item.dias_sem_comprar);
                   return (
-                    <tr key={item.cliente_id}>
+                    <tr
+                      key={item.cliente_id}
+                      className={styles.clickableRow}
+                      role="link"
+                      tabIndex={0}
+                      onClick={() => router.push(`/dashboard/clientes/${item.cliente_id}`)}
+                      onKeyDown={(event) => {
+                        if (event.key === 'Enter' || event.key === ' ') {
+                          event.preventDefault();
+                          router.push(`/dashboard/clientes/${item.cliente_id}`);
+                        }
+                      }}
+                    >
                       <td className={styles.customerCell}>
                         <div className={styles.avatar}>{(item.nome || 'C').trim().charAt(0).toUpperCase()}</div>
                         <div>
