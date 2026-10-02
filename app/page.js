@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import TestNav from '../components/TestNav';
-import { buscarProdutos, buscarStatusPedido, criarPedido } from '../lib/padariaSupabase';
+import { buscarProdutos, buscarStatusPedido, cadastrarCliente, criarPedido } from '../lib/padariaSupabase';
 
 const categories = [
   'Todos', 'Mais pedidos', 'Smash Burgers', 'Burgers Artesanais', 'Combos',
@@ -127,8 +127,11 @@ export default function Home() {
   const [orderNote, setOrderNote] = useState('');
   const [sentMessage, setSentMessage] = useState('');
   const [activeOrder, setActiveOrder] = useState(null);
+  const [customerName, setCustomerName] = useState('');
   const [whatsapp, setWhatsapp] = useState('');
   const [marketingSaved, setMarketingSaved] = useState(false);
+  const [marketingSaving, setMarketingSaving] = useState(false);
+  const [marketingError, setMarketingError] = useState('');
   const [showTracking, setShowTracking] = useState(true);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [detailQty, setDetailQty] = useState(1);
@@ -146,7 +149,9 @@ export default function Home() {
 
   useEffect(() => {
     const savedWhatsapp = localStorage.getItem('cardapio_last_whatsapp');
+    const savedName = localStorage.getItem('cardapio_customer_name');
     if (savedWhatsapp) setWhatsapp(savedWhatsapp);
+    if (savedName) setCustomerName(savedName);
   }, []);
 
   useEffect(() => {
@@ -270,11 +275,13 @@ export default function Home() {
       : Math.floor(Math.random() * 36);
 
     try {
+      const savedClientId = Number(localStorage.getItem('cardapio_cliente_id') || 0) || null;
       const created = await criarPedido({
         qrNumero: table,
         itens: cartItems.map((p) => ({ product_id: p.id, name: p.name, category: p.category, qty: p.qty, unit_price: p.price, extras: p.extras, meat_point: p.meatPoint || null, note: p.itemNote || '', unit_total: p.unitTotal, subtotal: p.subtotal })),
         observacao: orderNote.trim(),
         total,
+        clienteId: savedClientId,
       });
 
       const order = {
@@ -309,28 +316,44 @@ export default function Home() {
     }
   };
 
-  const saveMarketingLead = () => {
+  const saveMarketingLead = async () => {
     const cleaned = whatsapp.replace(/\D/g, '');
-    if (cleaned.length < 10) return;
-
-    let leads = [];
-    try {
-      leads = JSON.parse(localStorage.getItem('padaria_qr_marketing_leads_v1') || '[]');
-      if (!Array.isArray(leads)) leads = [];
-    } catch {
-      leads = [];
+    if (cleaned.length < 10 || marketingSaving) {
+      if (cleaned.length < 10) setMarketingError('Informe um WhatsApp válido.');
+      return;
     }
 
-    const lead = {
-      whatsapp: cleaned,
-      qr: activeOrder?.table ?? mesa,
-      createdAt: new Date().toISOString(),
-      source: 'pos-pedido',
-    };
+    setMarketingSaving(true);
+    setMarketingError('');
 
-    localStorage.setItem('padaria_qr_marketing_leads_v1', JSON.stringify([lead, ...leads]));
-    localStorage.setItem('cardapio_last_whatsapp', whatsapp);
-    setMarketingSaved(true);
+    try {
+      const currentParams = new URLSearchParams(window.location.search);
+      const client = await cadastrarCliente({
+        whatsapp: cleaned,
+        nome: customerName.trim() || null,
+        pedidoToken: activeOrder?.token || null,
+        aceitaPromocoes: true,
+        origem: 'cardapio_qrcode',
+        origemDetalhe: activeOrder?.table != null ? `mesa_${activeOrder.table}` : 'cadastro_pos_pedido',
+        utmSource: currentParams.get('utm_source'),
+        utmMedium: currentParams.get('utm_medium'),
+        utmCampaign: currentParams.get('utm_campaign'),
+        qrNumero: activeOrder?.table ?? (qrFromUrl !== '' ? Number(qrFromUrl) : null),
+      });
+
+      if (!client?.id) throw new Error('Cliente não retornado pelo cadastro.');
+
+      localStorage.setItem('cardapio_cliente_id', String(client.id));
+      localStorage.setItem('cardapio_last_whatsapp', cleaned);
+      if (customerName.trim()) localStorage.setItem('cardapio_customer_name', customerName.trim());
+      setWhatsapp(cleaned);
+      setMarketingSaved(true);
+    } catch (error) {
+      console.error('Erro ao cadastrar cliente:', error);
+      setMarketingError('Não foi possível concluir o cadastro. Tente novamente.');
+    } finally {
+      setMarketingSaving(false);
+    }
   };
 
   const returnToMenu = () => {
@@ -433,6 +456,15 @@ export default function Home() {
             {!marketingSaved ? (
               <div className="optin-form">
                 <input
+                  type="text"
+                  name="name"
+                  autoComplete="name"
+                  value={customerName}
+                  onChange={(e) => setCustomerName(e.target.value)}
+                  placeholder="Seu nome"
+                  aria-label="Seu nome"
+                />
+                <input
                   type="tel"
                   name="tel"
                   autoComplete="tel"
@@ -442,11 +474,14 @@ export default function Home() {
                   inputMode="tel"
                   aria-label="Seu WhatsApp"
                 />
-                <button onClick={saveMarketingLead}>Quero receber novidades</button>
-                <small>Opcional. Você escolhe se quer receber mensagens.</small>
+                <button onClick={saveMarketingLead} disabled={marketingSaving}>
+                  {marketingSaving ? 'Cadastrando...' : 'Cadastrar e receber novidades'}
+                </button>
+                {marketingError && <small>{marketingError}</small>}
+                <small>Seu cadastro ajuda a reconhecer seus próximos pedidos. O recebimento de promoções é opcional.</small>
               </div>
             ) : (
-              <div className="optin-success">Pronto. Seu WhatsApp foi cadastrado nesta versão de teste.</div>
+              <div className="optin-success">Pronto. Seu cadastro foi salvo.</div>
             )}
           </aside>
         </section>
