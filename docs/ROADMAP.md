@@ -55,15 +55,15 @@
 - [x] Reaproveitar `cliente_id` nos pedidos futuros quando reconhecido
 - [x] Criar `VW_CARDAPIO_QRCODE_CLIENTES_INTELIGENCIA`
 - [x] Calcular recência, frequência, ticket, gasto e pedidos 30/90 dias
-- [x] Derivar produtos e categorias preferidas
+- [ ] Implementar inteligência individual de produtos e categorias preferidas no perfil do cliente
 - [x] Criar dashboard `/dashboard/clientes`
 - [x] Criar busca, filtros, ordenação e paginação
 - [x] Adicionar Clientes à navegação superior
 - [ ] Tornar a linha inteira do cliente clicável
 - [ ] Criar `/dashboard/clientes/[cliente_id]`
 - [ ] Exibir histórico detalhado de pedidos
-- [ ] Exibir produtos e combinações frequentes
-- [ ] Exibir perfil de consumo por dia/horário/frequência
+- [ ] Calcular e exibir produtos e combinações frequentes por cliente
+- [ ] Implementar perfil de consumo por dia/horário/frequência
 - [ ] Criar sugestões com clientes semelhantes (Jaccard)
 - [ ] Separar visualmente favoritos de oportunidades de mix
 - [ ] Adicionar indicadores futuros de risco de abandono e produto que parou de pedir
