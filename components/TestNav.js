@@ -6,6 +6,7 @@ export default function TestNav() {
         <div className="test-links">
           <a href="/">Cardápio</a>
           <a href="/pedidos">Pedidos</a>
+          <a href="/dashboard/clientes">Clientes</a>
         </div>
       </div>
     </nav>
