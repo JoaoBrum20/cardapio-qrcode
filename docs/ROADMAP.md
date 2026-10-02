@@ -55,17 +55,17 @@
 - [x] Reaproveitar `cliente_id` nos pedidos futuros quando reconhecido
 - [x] Criar `VW_CARDAPIO_QRCODE_CLIENTES_INTELIGENCIA`
 - [x] Calcular recência, frequência, ticket, gasto e pedidos 30/90 dias
-- [ ] Implementar inteligência individual de produtos e categorias preferidas no perfil do cliente
+- [x] Implementar inteligência individual de produtos e categorias preferidas no perfil do cliente
 - [x] Criar dashboard `/dashboard/clientes`
 - [x] Criar busca, filtros, ordenação e paginação
 - [x] Adicionar Clientes à navegação superior
-- [ ] Tornar a linha inteira do cliente clicável
-- [ ] Criar `/dashboard/clientes/[cliente_id]`
-- [ ] Exibir histórico detalhado de pedidos
-- [ ] Calcular e exibir produtos e combinações frequentes por cliente
-- [ ] Implementar perfil de consumo por dia/horário/frequência
-- [ ] Criar sugestões com clientes semelhantes (Jaccard)
-- [ ] Separar visualmente favoritos de oportunidades de mix
+- [x] Tornar a linha inteira do cliente clicável
+- [x] Criar `/dashboard/clientes/[cliente_id]`
+- [x] Exibir histórico detalhado de pedidos
+- [x] Calcular e exibir produtos e combinações frequentes por cliente
+- [x] Implementar perfil de consumo por dia/horário/frequência
+- [x] Criar sugestões com clientes semelhantes (Jaccard)
+- [x] Separar visualmente favoritos de oportunidades de mix
 - [ ] Adicionar indicadores futuros de risco de abandono e produto que parou de pedir
 
 ## 8. Segurança do dashboard
@@ -74,3 +74,17 @@
 - [x] Preparar API server-side para `SUPABASE_SECRET_KEY`
 - [ ] Confirmar `SUPABASE_SECRET_KEY` em Production na Vercel e redeploy
 - [ ] Adicionar autenticação administrativa completa antes de uso com múltiplos operadores
+
+
+## 9. Perfil 360º e proteção administrativa
+- [x] Criar função `cardapio_qrcode_cliente_360`
+- [x] Ranking de produtos por cliente
+- [x] Combinações compradas juntas
+- [x] Adicionais e pontos de carne
+- [x] Histórico expansível de pedidos
+- [x] Similaridade Jaccard
+- [x] Oportunidades de produtos ainda não comprados
+- [x] Criar login simples do dashboard
+- [x] Proteger APIs de clientes com sessão HttpOnly
+- [ ] Configurar `DASHBOARD_PASSWORD` em Production na Vercel
+- [ ] Evoluir o login simples para autenticação multiusuário quando necessário
