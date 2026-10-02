@@ -116,6 +116,7 @@ const fallbackProducts = fallbackProductRows.map((p, i) => ({
 }));
 
 const money = (n) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(n);
+const GOOGLE_REVIEW_URL = '';
 
 export default function Home() {
   const [products, setProducts] = useState(fallbackProducts);
@@ -178,7 +179,7 @@ export default function Home() {
         const current = await buscarStatusPedido(token);
         if (!current || cancelled) return;
 
-        setActiveOrder({
+        const nextOrder = {
           id: current.id,
           token: current.pedido_token,
           table: current.qr_numero,
@@ -187,7 +188,14 @@ export default function Home() {
           note: current.observacao || '',
           total: Number(current.total || 0),
           createdAt: current.criado_em,
-        });
+        };
+
+        setActiveOrder(nextOrder);
+
+        if (nextOrder.status === 'PRONTO') {
+          sessionStorage.removeItem('padaria_active_order_token');
+          sessionStorage.removeItem('padaria_active_qr');
+        }
       } catch (error) {
         console.error('Erro ao acompanhar pedido:', error);
       }
@@ -333,6 +341,46 @@ export default function Home() {
   const viewTracking = () => {
     setShowTracking(true);
   };
+
+  if (activeOrder?.status === 'PRONTO' && showTracking) {
+    return (
+      <main>
+        <TestNav />
+        <section className="thank-you-page">
+          <div className="thank-you-card">
+            <span className="status-kicker">PEDIDO #{activeOrder.id}</span>
+            <div className="thank-you-icon">✓</div>
+            <h1>Obrigado!</h1>
+            <p>Seu pedido foi finalizado. Esperamos que aproveite.</p>
+
+            <div className="review-offer">
+              <span>GOSTOU?</span>
+              <h2>Que tal nos avaliar no Google?</h2>
+              <p>Avalie a hamburgueria e ganhe um Sonho.</p>
+            </div>
+
+            {GOOGLE_REVIEW_URL ? (
+              <a className="google-review-button" href={GOOGLE_REVIEW_URL} target="_blank" rel="noreferrer">
+                Avaliar no Google
+              </a>
+            ) : (
+              <button className="google-review-button is-disabled" disabled>
+                Avaliar no Google
+              </button>
+            )}
+
+            {!GOOGLE_REVIEW_URL && (
+              <small className="review-link-note">Link de avaliação ainda não configurado.</small>
+            )}
+
+            <button className="new-order-button secondary" onClick={() => { setActiveOrder(null); setShowTracking(false); }}>
+              Voltar ao cardápio
+            </button>
+          </div>
+        </section>
+      </main>
+    );
+  }
 
   if (activeOrder && showTracking) {
     const statusIndex = activeOrder.status === 'NOVO' ? 0 : activeOrder.status === 'PREPARANDO' ? 1 : 2;
