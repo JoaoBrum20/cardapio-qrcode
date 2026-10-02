@@ -1,0 +1,303 @@
+.page {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  background: #f4f3ef;
+  color: #181818;
+}
+
+.sidebar {
+  background: #171717;
+  color: #fff;
+  padding: 28px 18px;
+  min-height: 100vh;
+}
+
+.brand {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 0 10px 28px;
+}
+
+.brand span {
+  font-size: 11px;
+  letter-spacing: .2em;
+  opacity: .6;
+}
+
+.brand strong {
+  font-size: 21px;
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.nav a,
+.nav span {
+  color: #c8c8c8;
+  text-decoration: none;
+  padding: 11px 12px;
+  border-radius: 10px;
+  font-size: 14px;
+}
+
+.nav span {
+  opacity: .45;
+}
+
+.nav .active {
+  color: #fff;
+  background: #2b2b2b;
+}
+
+.content {
+  min-width: 0;
+  padding: 34px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+  margin-bottom: 22px;
+}
+
+.header h1 {
+  margin: 3px 0 7px;
+  font-size: 34px;
+}
+
+.header p {
+  margin: 0;
+  color: #686868;
+}
+
+.eyebrow {
+  font-size: 11px;
+  letter-spacing: .16em;
+  font-weight: 800;
+  color: #237c45;
+}
+
+.summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.summary > div {
+  background: #fff;
+  border: 1px solid #e1dfd8;
+  border-radius: 14px;
+  padding: 17px 18px;
+}
+
+.summary span {
+  display: block;
+  font-size: 12px;
+  color: #777;
+  margin-bottom: 7px;
+}
+
+.summary strong {
+  font-size: 23px;
+}
+
+.panel {
+  background: #fff;
+  border: 1px solid #dfddd5;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.toolbar {
+  display: grid;
+  grid-template-columns: minmax(260px, 1.5fr) minmax(180px, .8fr) minmax(220px, 1fr) auto;
+  gap: 10px;
+  padding: 14px;
+  border-bottom: 1px solid #eceae4;
+}
+
+.search,
+.toolbar select,
+.footer select {
+  height: 42px;
+  border: 1px solid #d8d6cf;
+  border-radius: 9px;
+  background: #fff;
+  padding: 0 12px;
+  color: #242424;
+}
+
+.primaryButton,
+.secondaryButton,
+.pagination button {
+  border: 0;
+  border-radius: 9px;
+  min-height: 42px;
+  padding: 0 16px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.primaryButton {
+  background: #237c45;
+  color: #fff;
+}
+
+.secondaryButton,
+.pagination button {
+  background: #fff;
+  color: #222;
+  border: 1px solid #d8d6cf;
+}
+
+.primaryButton:disabled,
+.secondaryButton:disabled,
+.pagination button:disabled {
+  opacity: .45;
+  cursor: default;
+}
+
+.error {
+  margin: 14px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: #fff4f2;
+  border: 1px solid #efd1cb;
+  color: #8e3028;
+  font-size: 14px;
+}
+
+.tableWrap {
+  width: 100%;
+  overflow: auto;
+  max-height: calc(100vh - 350px);
+}
+
+.table {
+  width: 100%;
+  min-width: 1450px;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 13px;
+}
+
+.table th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: #f8f7f4;
+  color: #686868;
+  text-align: left;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .055em;
+  padding: 12px 14px;
+  border-bottom: 1px solid #dfddd5;
+  white-space: nowrap;
+}
+
+.table td {
+  padding: 13px 14px;
+  border-bottom: 1px solid #efede8;
+  white-space: nowrap;
+  vertical-align: top;
+}
+
+.table tbody tr:hover {
+  background: #fbfaf7;
+}
+
+.helper {
+  display: block;
+  margin-top: 4px;
+  font-size: 11px;
+  color: #989898;
+}
+
+.number {
+  font-variant-numeric: tabular-nums;
+}
+
+.empty {
+  text-align: center;
+  color: #777;
+  padding: 40px !important;
+}
+
+.footer {
+  min-height: 62px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 14px;
+  border-top: 1px solid #e8e6df;
+  color: #666;
+  font-size: 13px;
+}
+
+.footerLeft,
+.pagination {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.footer select {
+  height: 36px;
+}
+
+.pagination button {
+  min-height: 36px;
+}
+
+@media (max-width: 900px) {
+  .page {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    min-height: auto;
+    padding: 14px;
+  }
+
+  .nav {
+    flex-direction: row;
+    overflow-x: auto;
+  }
+
+  .brand {
+    padding-bottom: 12px;
+  }
+
+  .content {
+    padding: 18px 12px;
+  }
+
+  .summary {
+    grid-template-columns: 1fr;
+  }
+
+  .toolbar {
+    grid-template-columns: 1fr;
+  }
+
+  .header,
+  .footer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .footerLeft,
+  .pagination {
+    justify-content: space-between;
+  }
+}
