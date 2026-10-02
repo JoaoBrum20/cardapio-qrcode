@@ -1,7 +1,7 @@
 import {
   dashboardAuthConfigured,
   isDashboardAuthorized,
-} from '@/lib/dashboardAuth';
+} from '../../../../lib/dashboardAuth';
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://gaqbythsligifhuuuest.supabase.co';
 
