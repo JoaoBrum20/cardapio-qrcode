@@ -297,3 +297,169 @@ Nenhuma dessas chaves deve receber o prefixo `NEXT_PUBLIC_`.
 ### Limpeza técnica
 
 Foi removida uma implementação dinâmica antiga duplicada em `/clientes/[id]`, que conflitava com a nova rota `/clientes/[clienteId]` e ainda apontava para um CSS inexistente.
+
+
+## Atualização — 02/10/2026: perfil 360, segurança e persistência do pedido
+
+### Inteligência individual por cliente
+
+Foi implementada a função server-side/Supabase:
+
+- `cardapio_qrcode_cliente_360(cliente_id)`
+
+Ela monta um perfil consolidado do cliente com base nos pedidos reais e retorna:
+
+- cadastro do cliente;
+- total de pedidos;
+- primeira compra;
+- última compra;
+- dias sem comprar;
+- total gasto;
+- ticket médio;
+- frequência média;
+- pedidos em 30 e 90 dias;
+- QR/mesa mais usado;
+- dia da semana mais comum;
+- horário mais comum;
+- ranking de produtos;
+- quantidade comprada por produto;
+- percentual dos pedidos com cada produto;
+- valor acumulado por produto;
+- última compra do produto;
+- combinações de produtos comprados juntos;
+- adicionais mais usados;
+- pontos da carne;
+- histórico de pedidos;
+- clientes semelhantes;
+- sugestões de produtos.
+
+### Similaridade Jaccard
+
+As sugestões usam similaridade de Jaccard entre os conjuntos de produtos comprados por cada cliente.
+
+Fluxo:
+1. cria o conjunto de produtos do cliente;
+2. compara com os conjuntos dos demais clientes;
+3. calcula interseção / união;
+4. descarta clientes sem interseção;
+5. ordena os mais semelhantes;
+6. identifica produtos comprados por esses semelhantes que o cliente analisado ainda não comprou;
+7. ordena as oportunidades por peso acumulado de similaridade, quantidade de clientes semelhantes e frequência.
+
+Quando a base ainda não possui interseção suficiente entre clientes, nenhuma sugestão é criada artificialmente. A interface informa que ainda faltam dados.
+
+### Nova página individual do cliente
+
+Rota criada:
+
+- `/dashboard/clientes/[clienteId]`
+
+A linha inteira da lista de clientes passou a ser clicável.
+
+A nova tela mostra:
+- nome;
+- WhatsApp;
+- cliente desde;
+- opt-in promocional;
+- total de pedidos;
+- ticket médio;
+- total gasto;
+- recência;
+- histórico de pedidos expansível;
+- produtos mais pedidos;
+- percentual dos pedidos em que o produto aparece;
+- combinações frequentes;
+- adicionais;
+- ponto da carne;
+- observações;
+- dia da semana mais comum;
+- horário mais comum;
+- frequência média;
+- média de itens por pedido;
+- QR/mesa mais usado;
+- categoria favorita;
+- origem do cadastro;
+- sugestões por clientes semelhantes.
+
+### Proteção administrativa simples
+
+Foi criada uma proteção temporária para o dashboard antes da futura autenticação multiusuário.
+
+Novas rotas:
+- `/dashboard/login`
+- `/api/dashboard/login`
+
+Nova variável privada esperada na Vercel:
+- `DASHBOARD_PASSWORD`
+
+Após o login, o servidor grava uma sessão em cookie:
+- `HttpOnly`
+- `Secure`
+- `SameSite=Strict`
+
+As APIs de clientes exigem essa sessão administrativa.
+
+A leitura administrativa do Supabase continua sendo feita somente no servidor por:
+- `SUPABASE_SECRET_KEY`
+- fallback legado `SUPABASE_SERVICE_ROLE_KEY`
+
+Essas chaves nunca devem usar prefixo `NEXT_PUBLIC_`.
+
+### Limpeza de rotas duplicadas
+
+Foi removida a implementação dinâmica antiga:
+- `/dashboard/clientes/[id]`
+- `/api/dashboard/clientes/[id]`
+
+Ela conflitava com a nova estrutura `[clienteId]` e ainda referenciava um CSS antigo inexistente.
+
+### Persistência do pedido em montagem
+
+Foi corrigido um problema importante do fluxo do cliente: o carrinho podia ser perdido ao entrar no checkout/acompanhamento e voltar para o cardápio.
+
+Foi adicionada persistência temporária no navegador usando:
+- `sessionStorage`
+- chave `cardapio_order_draft_v1`
+
+O rascunho salva:
+- itens do carrinho;
+- quantidades;
+- observações por item;
+- adicionais;
+- ponto da carne;
+- observação geral do pedido.
+
+O rascunho é restaurado quando a página é carregada novamente na mesma sessão.
+
+Também foi corrigida a função de retorno ao cardápio:
+- **voltar ao cardápio não limpa mais o carrinho nem as observações**.
+
+O rascunho só é apagado depois que o pedido é enviado com sucesso para a cozinha.
+
+Isso protege o pedido em casos como:
+- abrir o checkout e voltar;
+- sair da tela de acompanhamento e voltar ao cardápio;
+- recarregar a página;
+- navegar dentro do mesmo site na mesma aba.
+
+### Estado após esta atualização
+
+Implementado:
+- lista administrativa de clientes;
+- métricas consolidadas;
+- perfil 360º;
+- histórico de pedidos;
+- favoritos;
+- combinações;
+- adicionais e preferências;
+- similaridade Jaccard;
+- sugestões por clientes semelhantes;
+- login administrativo simples;
+- proteção das APIs administrativas;
+- persistência do pedido em montagem.
+
+Pendências principais:
+- autenticação multiusuário completa no futuro;
+- risco de abandono;
+- produtos que o cliente deixou de pedir;
+- melhoria das sugestões conforme a base de clientes crescer.
