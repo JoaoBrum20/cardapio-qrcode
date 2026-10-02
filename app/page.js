@@ -348,24 +348,25 @@ export default function Home() {
         <TestNav />
         <section className="thank-you-page">
           <div className="thank-you-card">
-            <span className="status-kicker">PEDIDO #{activeOrder.id}</span>
+            <span className="status-kicker">PEDIDO #{activeOrder.id} FINALIZADO</span>
             <div className="thank-you-icon">✓</div>
-            <h1>Obrigado!</h1>
-            <p>Seu pedido foi finalizado. Esperamos que aproveite.</p>
+            <h1>Obrigado pelo pedido!</h1>
+            <p className="thank-you-subtitle">Esperamos que tenha gostado. Sua opinião ajuda muito a nossa hamburgueria.</p>
 
-            <div className="review-offer">
-              <span>GOSTOU?</span>
-              <h2>Que tal nos avaliar no Google?</h2>
-              <p>Avalie nossa hamburgueria e ganhe 1 porção de batata.</p>
+            <div className="review-offer review-offer-highlight">
+              <span>GANHE UMA PORÇÃO DE BATATA</span>
+              <h2>Avalie nossa hamburgueria no Google</h2>
+              <p>Faça sua avaliação e ganhe <strong>1 porção de batata</strong>.</p>
+              <small>Depois de avaliar, mostre a avaliação para nossa equipe para resgatar.</small>
             </div>
 
             {GOOGLE_REVIEW_URL ? (
               <a className="google-review-button" href={GOOGLE_REVIEW_URL} target="_blank" rel="noreferrer">
-                Avaliar no Google
+                Avaliar no Google e ganhar minha batata
               </a>
             ) : (
               <button className="google-review-button is-disabled" disabled>
-                Avaliar no Google
+                Avaliar no Google e ganhar minha batata
               </button>
             )}
 
