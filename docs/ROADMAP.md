@@ -45,3 +45,32 @@
 - [x] Manter fallback local temporário
 - [ ] Criar tela administrativa para editar catálogo sem acessar o Supabase
 - [ ] Permitir upload/gestão de imagens pela administração
+
+
+## 7. Clientes e CRM
+- [x] Criar `CARDAPIO_QRCODE_CLIENTES`
+- [x] Vincular `CARDAPIO_QRCODE_PEDIDOS.cliente_id`
+- [x] Criar RPC de cadastro/atualização de cliente por WhatsApp
+- [x] Vincular pedido atual pelo `pedido_token`
+- [x] Reaproveitar `cliente_id` nos pedidos futuros quando reconhecido
+- [x] Criar `VW_CARDAPIO_QRCODE_CLIENTES_INTELIGENCIA`
+- [x] Calcular recência, frequência, ticket, gasto e pedidos 30/90 dias
+- [x] Derivar produtos e categorias preferidas
+- [x] Criar dashboard `/dashboard/clientes`
+- [x] Criar busca, filtros, ordenação e paginação
+- [x] Adicionar Clientes à navegação superior
+- [ ] Tornar a linha inteira do cliente clicável
+- [ ] Criar `/dashboard/clientes/[cliente_id]`
+- [ ] Exibir histórico detalhado de pedidos
+- [ ] Exibir produtos e combinações frequentes
+- [ ] Exibir perfil de consumo por dia/horário/frequência
+- [ ] Criar sugestões com clientes semelhantes (Jaccard)
+- [ ] Separar visualmente favoritos de oportunidades de mix
+- [ ] Adicionar indicadores futuros de risco de abandono e produto que parou de pedir
+
+## 8. Segurança do dashboard
+- [x] Manter publishable key no frontend
+- [x] Manter clientes sem leitura pública direta
+- [x] Preparar API server-side para `SUPABASE_SECRET_KEY`
+- [ ] Confirmar `SUPABASE_SECRET_KEY` em Production na Vercel e redeploy
+- [ ] Adicionar autenticação administrativa completa antes de uso com múltiplos operadores
