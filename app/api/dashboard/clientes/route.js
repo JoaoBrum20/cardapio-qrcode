@@ -12,11 +12,11 @@ const ORDER_MAP = {
 };
 
 export async function POST(request) {
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const serviceKey = process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
 
   if (!serviceKey) {
     return Response.json(
-      { error: 'Dashboard ainda sem credencial privada do Supabase na Vercel.' },
+      { error: 'Dashboard ainda sem SUPABASE_SECRET_KEY (ou SUPABASE_SERVICE_ROLE_KEY) na Vercel.' },
       { status: 503 }
     );
   }
