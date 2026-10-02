@@ -1,4 +1,9 @@
-const SUPABASE_URL = 'https://gaqbythsligifhuuuest.supabase.co';
+import {
+  dashboardAuthConfigured,
+  isDashboardAuthorized,
+} from '@/lib/dashboardAuth';
+
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://gaqbythsligifhuuuest.supabase.co';
 
 const ORDER_MAP = {
   'pedidos30-desc': ['pedidos_30d', 'desc'],
@@ -11,12 +16,39 @@ const ORDER_MAP = {
   'nome-asc': ['nome', 'asc'],
 };
 
-export async function POST(request) {
-  const serviceKey = process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
+function adminHeaders() {
+  const key = process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!key) return null;
 
-  if (!serviceKey) {
+  const headers = {
+    apikey: key,
+    Prefer: 'count=exact',
+    'Range-Unit': 'items',
+  };
+
+  if (!key.startsWith('sb_secret_')) {
+    headers.Authorization = `Bearer ${key}`;
+  }
+
+  return headers;
+}
+
+export async function POST(request) {
+  if (!dashboardAuthConfigured()) {
     return Response.json(
-      { error: 'Dashboard ainda sem SUPABASE_SECRET_KEY (ou SUPABASE_SERVICE_ROLE_KEY) na Vercel.' },
+      { error: 'Defina DASHBOARD_PASSWORD na Vercel para proteger o painel.' },
+      { status: 503 }
+    );
+  }
+
+  if (!isDashboardAuthorized(request)) {
+    return Response.json({ error: 'Sessão administrativa necessária.' }, { status: 401 });
+  }
+
+  const headers = adminHeaders();
+  if (!headers) {
+    return Response.json(
+      { error: 'Dashboard ainda sem SUPABASE_SECRET_KEY na Vercel.' },
       { status: 503 }
     );
   }
@@ -43,18 +75,13 @@ export async function POST(request) {
 
   const from = (page - 1) * pageSize;
   const to = from + pageSize - 1;
+  headers.Range = `${from}-${to}`;
 
   const response = await fetch(
     `${SUPABASE_URL}/rest/v1/VW_CARDAPIO_QRCODE_CLIENTES_INTELIGENCIA?${params.toString()}`,
     {
       method: 'GET',
-      headers: {
-        apikey: serviceKey,
-        Authorization: `Bearer ${serviceKey}`,
-        Prefer: 'count=exact',
-        Range: `${from}-${to}`,
-        'Range-Unit': 'items',
-      },
+      headers,
       cache: 'no-store',
     }
   );
@@ -71,13 +98,21 @@ export async function POST(request) {
   const filteredCount = countPart && countPart !== '*' ? Number(countPart) : data.length;
   const totalPages = Math.max(1, Math.ceil(filteredCount / pageSize));
 
-  return Response.json({
-    data,
-    pagination: {
-      page,
-      pageSize,
-      filteredCount,
-      totalPages,
+  return Response.json(
+    {
+      data,
+      pagination: {
+        page,
+        pageSize,
+        filteredCount,
+        totalPages,
+      },
     },
-  });
+    {
+      headers: {
+        'Cache-Control': 'private, no-store',
+        'X-Content-Type-Options': 'nosniff',
+      },
+    }
+  );
 }
