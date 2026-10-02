@@ -205,3 +205,95 @@ Planejamento da tela:
 - sugestões de produtos que o cliente ainda não pediu, mas clientes semelhantes costumam comprar.
 
 Para as sugestões, está planejado reaproveitar o conceito de similaridade de conjuntos por Jaccard, comparando os produtos comprados por cada cliente.
+
+
+## Implementação — 02/10/2026: inteligência individual por cliente
+
+A inteligência individual deixou de ser apenas planejamento e passou a ter uma implementação própria no banco e no dashboard.
+
+### Função de perfil 360º
+
+Foi criada no Supabase:
+- `cardapio_qrcode_cliente_360(cliente_id)`
+
+A função retorna, para um cliente:
+- cadastro e métricas consolidadas;
+- histórico de até 50 pedidos;
+- ranking de produtos comprados;
+- quantidade, pedidos em que cada produto apareceu e percentual dos pedidos;
+- valor histórico por produto;
+- última compra de cada produto;
+- combinações de produtos comprados no mesmo pedido;
+- adicionais mais usados;
+- pontos de carne registrados;
+- clientes semelhantes;
+- oportunidades de produtos ainda não comprados.
+
+### Similaridade e sugestões
+
+As sugestões usam similaridade **Jaccard** entre os conjuntos de produtos de cada cliente.
+
+Para cada cliente:
+1. é criado o conjunto de produtos já comprados;
+2. esse conjunto é comparado com os demais clientes;
+3. clientes sem nenhuma interseção são ignorados;
+4. os clientes mais semelhantes recebem um score Jaccard;
+5. produtos presentes nesses clientes e ausentes no cliente analisado viram candidatos;
+6. as oportunidades são ordenadas pelo peso acumulado de similaridade, quantidade de clientes semelhantes e frequência.
+
+Quando ainda não existe base com interseção suficiente, o sistema não inventa sugestões: a tela informa que ainda faltam dados. As oportunidades surgem automaticamente conforme o histórico cresce.
+
+### Tela individual do cliente
+
+Nova rota:
+- `/dashboard/clientes/[clienteId]`
+
+A linha inteira da lista de clientes agora é clicável.
+
+A tela individual mostra:
+- nome e WhatsApp;
+- data de cadastro;
+- opt-in promocional;
+- total de pedidos;
+- ticket médio;
+- total gasto;
+- recência;
+- produtos mais pedidos;
+- percentual de pedidos contendo cada produto;
+- sugestões por clientes semelhantes;
+- histórico expansível de pedidos;
+- itens, adicionais, ponto da carne e observações;
+- dia da semana mais comum;
+- horário mais comum;
+- frequência média;
+- média de itens por pedido;
+- QR/mesa mais usado;
+- categoria favorita;
+- combinações de produtos;
+- adicionais e personalizações;
+- origem do cadastro.
+
+### Proteção temporária do dashboard
+
+Como o dashboard contém telefone e histórico de consumo, foi adicionada uma proteção administrativa simples antes da autenticação completa.
+
+Nova variável privada esperada na Vercel:
+- `DASHBOARD_PASSWORD`
+
+Foi criada:
+- `/dashboard/login`
+- `/api/dashboard/login`
+
+Após o login, o servidor grava um cookie `HttpOnly`, `Secure` e `SameSite=Strict`.
+
+As APIs de clientes agora exigem essa sessão administrativa e continuam usando a chave privada do Supabase somente no servidor.
+
+Variáveis privadas:
+- `SUPABASE_SECRET_KEY` (preferida)
+- `SUPABASE_SERVICE_ROLE_KEY` (fallback legado)
+
+Nenhuma dessas chaves deve receber o prefixo `NEXT_PUBLIC_`.
+
+### Limpeza técnica
+
+Foi removida uma implementação dinâmica antiga duplicada em `/clientes/[id]`, que conflitava com a nova rota `/clientes/[clienteId]` e ainda apontava para um CSS inexistente.
