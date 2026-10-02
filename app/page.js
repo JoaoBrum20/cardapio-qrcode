@@ -117,6 +117,7 @@ const fallbackProducts = fallbackProductRows.map((p, i) => ({
 
 const money = (n) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(n);
 const GOOGLE_REVIEW_URL = '';
+const ORDER_DRAFT_KEY = 'cardapio_order_draft_v1';
 
 export default function Home() {
   const [products, setProducts] = useState(fallbackProducts);
@@ -142,6 +143,7 @@ export default function Home() {
   const [itemOptions, setItemOptions] = useState({});
   const [addedMessage, setAddedMessage] = useState('');
   const [sendingOrder, setSendingOrder] = useState(false);
+  const [draftHydrated, setDraftHydrated] = useState(false);
 
   const params = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
   const qrFromUrl = params?.get('qr') || params?.get('mesa') || '';
@@ -152,7 +154,43 @@ export default function Home() {
     const savedName = localStorage.getItem('cardapio_customer_name');
     if (savedWhatsapp) setWhatsapp(savedWhatsapp);
     if (savedName) setCustomerName(savedName);
+
+    try {
+      const rawDraft = sessionStorage.getItem(ORDER_DRAFT_KEY);
+      if (rawDraft) {
+        const draft = JSON.parse(rawDraft);
+        if (draft?.cart && typeof draft.cart === 'object') setCart(draft.cart);
+        if (draft?.itemNotes && typeof draft.itemNotes === 'object') setItemNotes(draft.itemNotes);
+        if (draft?.itemOptions && typeof draft.itemOptions === 'object') setItemOptions(draft.itemOptions);
+        if (typeof draft?.orderNote === 'string') setOrderNote(draft.orderNote);
+      }
+    } catch (error) {
+      console.error('Erro ao restaurar pedido em montagem:', error);
+      sessionStorage.removeItem(ORDER_DRAFT_KEY);
+    } finally {
+      setDraftHydrated(true);
+    }
   }, []);
+
+  useEffect(() => {
+    if (!draftHydrated) return;
+
+    const hasDraft =
+      Object.values(cart).some((qty) => Number(qty) > 0) ||
+      Boolean(orderNote.trim()) ||
+      Object.values(itemNotes).some((note) => String(note || '').trim()) ||
+      Object.keys(itemOptions).length > 0;
+
+    if (!hasDraft) {
+      sessionStorage.removeItem(ORDER_DRAFT_KEY);
+      return;
+    }
+
+    sessionStorage.setItem(
+      ORDER_DRAFT_KEY,
+      JSON.stringify({ cart, itemNotes, itemOptions, orderNote })
+    );
+  }, [cart, itemNotes, itemOptions, orderNote, draftHydrated]);
 
   useEffect(() => {
     let cancelled = false;
@@ -304,6 +342,7 @@ export default function Home() {
       setItemNotes({});
       setItemOptions({});
       setOrderNote('');
+      sessionStorage.removeItem(ORDER_DRAFT_KEY);
       setCartOpen(false);
       setSentMessage(`Pedido enviado para a Mesa ${table}`);
       setTimeout(() => setSentMessage(''), 3500);
@@ -357,9 +396,8 @@ export default function Home() {
   };
 
   const returnToMenu = () => {
+    // Voltar para o cardápio nunca deve apagar um pedido que esteja sendo montado.
     setShowTracking(false);
-    setCart({});
-    setOrderNote('');
   };
 
   const viewTracking = () => {
