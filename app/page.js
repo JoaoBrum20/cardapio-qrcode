@@ -193,6 +193,7 @@ export default function Home() {
         setActiveOrder(nextOrder);
 
         if (nextOrder.status === 'PRONTO') {
+          setShowTracking(true);
           sessionStorage.removeItem('padaria_active_order_token');
           sessionStorage.removeItem('padaria_active_qr');
         }
