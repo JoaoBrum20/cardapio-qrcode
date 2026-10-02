@@ -687,3 +687,17 @@
     justify-content: space-between;
   }
 }
+
+
+.clickableRow {
+  cursor: pointer;
+}
+
+.clickableRow:hover {
+  background: #f4f8f5 !important;
+}
+
+.clickableRow:focus-visible {
+  outline: 2px solid #4d8a65;
+  outline-offset: -2px;
+}
