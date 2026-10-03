@@ -99,10 +99,17 @@ export default function PedidosPage() {
 
             <div className={styles.ticketBody}>
               <div className={styles.items}>
-                {order.items.map((item) => (
-                  <div className={styles.item} key={item.name}>
+                {order.items.map((item, index) => (
+                  <div className={styles.item} key={`${item.name}-${index}`}>
                     <strong>{item.qty}×</strong>
-                    <span>{item.name}</span>
+                    <div className={styles.itemContent}>
+                      <span>{item.name}</span>
+                      {item.meat_point && <small><b>Ponto:</b> {item.meat_point}</small>}
+                      {Array.isArray(item.extras) && item.extras.length > 0 && (
+                        <small><b>Adicionais:</b> {item.extras.map((extra) => extra.nome || extra.name).filter(Boolean).join(', ')}</small>
+                      )}
+                      {item.note && <small className={styles.itemNote}><b>Obs.:</b> {item.note}</small>}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -134,10 +141,17 @@ export default function PedidosPage() {
             </header>
 
             <div className={styles.expandedItems}>
-              {selected.items.map((item) => (
-                <div key={item.name}>
+              {selected.items.map((item, index) => (
+                <div key={`${item.name}-${index}`}>
                   <strong>{item.qty}×</strong>
-                  <span>{item.name}</span>
+                  <div className={styles.expandedItemContent}>
+                    <span>{item.name}</span>
+                    {item.meat_point && <small><b>Ponto:</b> {item.meat_point}</small>}
+                    {Array.isArray(item.extras) && item.extras.length > 0 && (
+                      <small><b>Adicionais:</b> {item.extras.map((extra) => extra.nome || extra.name).filter(Boolean).join(', ')}</small>
+                    )}
+                    {item.note && <small className={styles.expandedItemNote}><b>Obs.:</b> {item.note}</small>}
+                  </div>
                 </div>
               ))}
             </div>
