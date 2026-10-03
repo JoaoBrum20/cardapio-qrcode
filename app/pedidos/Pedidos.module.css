@@ -256,3 +256,58 @@
     grid-auto-columns:min(86vw,320px);
   }
 }
+
+
+.itemContent{
+  min-width:0;
+  display:grid;
+  gap:2px;
+}
+.itemContent>span{
+  font-weight:800;
+}
+.itemContent small{
+  display:block;
+  font-size:10px;
+  line-height:1.25;
+  color:#555;
+  font-weight:500;
+}
+.itemContent small b{
+  color:#222;
+  font-weight:800;
+}
+.itemContent .itemNote{
+  margin-top:2px;
+  padding:4px 6px;
+  background:#fff2c7;
+  color:#5a430d;
+  border-radius:3px;
+}
+
+.expandedItemContent{
+  min-width:0;
+  display:grid;
+  gap:5px;
+}
+.expandedItemContent>span{
+  font-weight:800;
+}
+.expandedItemContent small{
+  display:block;
+  font-size:14px;
+  line-height:1.3;
+  color:#555;
+  font-weight:500;
+}
+.expandedItemContent small b{
+  color:#222;
+  font-weight:800;
+}
+.expandedItemContent .expandedItemNote{
+  margin-top:3px;
+  padding:7px 9px;
+  background:#fff0b6;
+  color:#5a430d;
+  border-radius:4px;
+}
