@@ -83,7 +83,7 @@
   border: 0;
   background: transparent;
   color: #666a64;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 700;
   cursor: pointer;
 }
@@ -116,14 +116,14 @@
 .eyebrow {
   display: block;
   color: #2c774a;
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 850;
   letter-spacing: .13em;
 }
 
 .hero h1 {
   margin: 4px 0 7px;
-  font-size: 26px;
+  font-size: 30px;
   letter-spacing: -.04em;
 }
 
@@ -132,7 +132,7 @@
   flex-wrap: wrap;
   gap: 7px 18px;
   color: #747871;
-  font-size: 10px;
+  font-size: 12px;
 }
 
 .heroActions button,
@@ -144,7 +144,7 @@
   background: #fff;
   color: #464a44;
   font: inherit;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 750;
   cursor: pointer;
 }
@@ -172,20 +172,20 @@
 
 .metrics span {
   color: #777b74;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 700;
 }
 
 .metrics strong {
   margin-top: 5px;
-  font-size: 22px;
+  font-size: 26px;
   letter-spacing: -.035em;
 }
 
 .metrics small {
   margin-top: 4px;
   color: #a0a39d;
-  font-size: 9px;
+  font-size: 11px;
 }
 
 .mainGrid {
@@ -212,7 +212,7 @@
 
 .card h2 {
   margin: 4px 0 0;
-  font-size: 15px;
+  font-size: 18px;
   letter-spacing: -.015em;
 }
 
@@ -226,7 +226,7 @@
 
 .muted {
   color: #9a9d97;
-  font-size: 9px;
+  font-size: 11px;
 }
 
 .productGrid {
@@ -249,7 +249,7 @@
 
 .rank {
   color: #a6aaa4;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 850;
 }
 
@@ -263,7 +263,7 @@
 .productCard strong {
   overflow: hidden;
   color: #262925;
-  font-size: 11px;
+  font-size: 13px;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -271,7 +271,7 @@
 .productCard span {
   margin-top: 3px;
   color: #8b8f88;
-  font-size: 9px;
+  font-size: 11px;
 }
 
 .productStats {
@@ -280,13 +280,13 @@
 
 .productStats b {
   color: #2d6744;
-  font-size: 12px;
+  font-size: 14px;
 }
 
 .productStats small {
   margin-top: 3px;
   color: #9da09a;
-  font-size: 8px;
+  font-size: 10px;
 }
 
 .suggestionGrid {
@@ -328,15 +328,15 @@
   display: block;
 }
 
-.suggestion strong { font-size: 11px; }
-.suggestion span { margin-top: 2px; color: #7d827b; font-size: 9px; }
-.suggestion small { margin-top: 5px; color: #43805a; font-size: 8px; }
-.suggestion > b { font-size: 10px; }
+.suggestion strong { font-size: 13px; }
+.suggestion span { margin-top: 2px; color: #7d827b; font-size: 11px; }
+.suggestion small { margin-top: 5px; color: #43805a; font-size: 10px; }
+.suggestion > b { font-size: 12px; }
 
 .similarNote {
   margin-top: 10px;
   color: #8b8f88;
-  font-size: 9px;
+  font-size: 11px;
 }
 
 .orders {
@@ -372,8 +372,8 @@
   display: block;
 }
 
-.orderSummary strong { font-size: 11px; }
-.orderSummary span { margin-top: 3px; color: #8e928b; font-size: 9px; }
+.orderSummary strong { font-size: 13px; }
+.orderSummary span { margin-top: 3px; color: #8e928b; font-size: 11px; }
 
 .orderNumbers {
   display: flex;
@@ -413,14 +413,14 @@
   display: block;
 }
 
-.orderItem strong { font-size: 10px; }
-.orderItem span { margin-top: 3px; color: #898d86; font-size: 8px; }
-.orderItem > b { font-size: 9px; }
+.orderItem strong { font-size: 12px; }
+.orderItem span { margin-top: 3px; color: #898d86; font-size: 10px; }
+.orderItem > b { font-size: 11px; }
 
 .orderObservation {
   padding-top: 8px;
   color: #6f736c;
-  font-size: 9px;
+  font-size: 11px;
 }
 
 .profileList {
@@ -439,13 +439,13 @@
 
 .profileList dt {
   color: #858982;
-  font-size: 9px;
+  font-size: 11px;
 }
 
 .profileList dd {
   margin: 0;
   color: #343733;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 750;
   text-align: right;
 }
@@ -469,14 +469,14 @@
 
 .simpleList strong {
   color: #333632;
-  font-size: 9px;
-  line-height: 1.35;
+  font-size: 11px;
+  line-height: 1.4;
 }
 
 .simpleList span {
   margin-top: 3px;
   color: #8b8f88;
-  font-size: 8px;
+  font-size: 10px;
 }
 
 .empty {
@@ -485,7 +485,7 @@
   border-radius: 10px;
   color: #858981;
   background: #fafbf9;
-  font-size: 10px;
+  font-size: 12px;
   line-height: 1.55;
 }
 
