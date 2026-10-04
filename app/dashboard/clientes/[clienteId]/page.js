@@ -197,11 +197,10 @@ export default function ClientePerfilPage() {
                           <div className={styles.rank}>{String(index + 1).padStart(2, '0')}</div>
                           <div>
                             <strong>{produto.produto}</strong>
-                            <span>{produto.categoria || 'Sem categoria'}</span>
+                            <span>Presente em {Number(produto.pedidos || 0)} de {Number(cliente.total_pedidos || 0)} pedidos</span>
                           </div>
                           <div className={styles.productStats}>
                             <b>{Number(produto.quantidade || 0)}x</b>
-                            <small>{Number(produto.percentual_pedidos || 0).toLocaleString('pt-BR')}% dos pedidos</small>
                           </div>
                         </article>
                       ))}
