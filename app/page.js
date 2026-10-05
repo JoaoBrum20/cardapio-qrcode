@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import Image from 'next/image';
 import TestNav from '../components/TestNav';
 import { buscarProdutos, buscarStatusPedido, cadastrarCliente, criarPedido } from '../lib/padariaSupabase';
 
@@ -584,7 +585,7 @@ export default function Home() {
             const qty = cart[p.id] || 0;
             return (
               <article className={'card product-card-clickable ' + (!p.available ? 'product-unavailable' : '')} key={p.id} onClick={() => openProduct(p)} tabIndex={p.available ? 0 : -1} aria-disabled={!p.available} onKeyDown={(e) => { if (p.available && (e.key === 'Enter' || e.key === ' ')) openProduct(p); }}>
-                <div className="product-mark"><img src={p.image} alt={p.name} loading="lazy" />{!p.available && <span className="unavailable-badge">Indisponível</span>}</div>
+                <div className="product-mark"><Image src={p.image} alt={p.name} fill sizes="(max-width: 620px) 110px, 140px" quality={65} />{!p.available && <span className="unavailable-badge">Indisponível</span>}</div>
                 <div className="card-body">
                   <div className="category-label">{p.category}</div>
                   <h3>{p.name}</h3>
@@ -632,7 +633,7 @@ export default function Home() {
             <button className="product-detail-close" onClick={() => setSelectedProduct(null)} aria-label="Fechar">×</button>
 
             <div className="product-detail-image">
-              <img src={selectedProduct.image} alt={selectedProduct.name} />
+              <Image src={selectedProduct.image} alt={selectedProduct.name} fill sizes="(max-width: 720px) 100vw, 340px" quality={78} />
             </div>
 
             <div className="product-detail-content">
@@ -705,7 +706,7 @@ export default function Home() {
             <div className="cart-list">
               {cartItems.map((p) => (
                 <div className="cart-item" key={p.id}>
-                  <img className="cart-item-image" src={p.image} alt="" />
+                  <Image className="cart-item-image" src={p.image} alt="" width={58} height={58} sizes="58px" quality={60} />
                   <div className="cart-item-info">
                     <strong>{p.name}</strong>
                     <span>{money(p.unitTotal)} cada · subtotal {money(p.subtotal)}</span>
